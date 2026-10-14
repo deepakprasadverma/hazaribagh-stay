@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="hi" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apna Hazaribagh Stay & Rent Hub | हॉस्टल, लॉज, फ्लैट, होटल एवं दुकान</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+  <!-- Leaflet CSS & JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body class="min-h-full flex flex-col text-slate-800 antialiased">
+
+  <!-- TOP ANNOUNCEMENT BAR -->
+  <div id="announcement-banner" class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white text-xs py-2 px-4 shadow-sm flex items-center justify-between">
+    <div class="container mx-auto flex items-center justify-center gap-2 text-center overflow-hidden">
+      <i class="fa-solid fa-bullhorn text-amber-300 animate-bounce"></i>
+      <span id="announcement-banner-text" class="font-medium tracking-wide">
+        हजारीबाग का #1 पोर्टल: रूम, हॉस्टल, लॉज, फ्लैट, होटल और दुकान खोजें या ओनर सीधे रजिस्टर करें!
+      </span>
+    </div>
+    <div class="hidden md:flex items-center gap-3 text-xs">
+      <a href="https://wa.me/919431100000" target="_blank" class="flex items-center gap-1 text-emerald-300 hover:text-white font-semibold">
+        <i class="fa-brands fa-whatsapp"></i> Help: 9431100000
+      </a>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="glass-header sticky top-0 z-40 border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo & City Tag -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="App.switchView('listings')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+            <i class="fa-solid fa-hotel text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-extrabold text-slate-900 text-lg md:text-xl tracking-tight">Hazaribagh<span class="text-blue-600">Stay</span></span>
+              <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded">HZB</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium">हजारीबाग स्टे एवं रेंट पोर्टल</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex items-center space-x-1 lg:space-x-3 text-sm">
+          <button data-view="listings" class="nav-btn px-3 py-2 rounded-lg font-bold text-blue-600 border-b-2 border-blue-600 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-list-ul"></i> Browse All
+          </button>
+          <button data-view="map" class="nav-btn px-3 py-2 rounded-lg font-medium text-slate-600 hover:text-blue-600 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-map-location-dot text-emerald-600"></i> HZB GPS Map
+          </button>
+          <button data-view="owner-add" class="nav-btn px-3 py-2 rounded-lg font-medium text-slate-600 hover:text-blue-600 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-plus-circle text-purple-600"></i> + List Property
+          </button>
+          
+          <!-- Conditional Role Menus -->
+          <button data-view="owner-dashboard" class="nav-btn owner-only px-3 py-2 rounded-lg font-medium text-slate-600 hover:text-blue-600 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-user-tie text-blue-600"></i> Owner Portal
+          </button>
+          <button data-view="admin-view" class="nav-btn admin-only px-3 py-2 rounded-lg font-medium text-slate-600 hover:text-blue-600 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-shield-halved text-indigo-600"></i> Admin
+          </button>
+          <button data-view="superadmin-view" class="nav-btn superadmin-only px-3 py-2 rounded-lg font-medium text-slate-600 hover:text-blue-600 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-crown text-amber-500"></i> Super Admin
+          </button>
+        </nav>
+
+        <!-- Role Switcher & Profile Dropdown (For testing all 4 user perspectives) -->
+        <div class="flex items-center gap-3">
+          <div class="bg-slate-100 hover:bg-slate-200 p-1.5 rounded-xl border border-slate-200 flex items-center gap-2 text-xs">
+            <span class="text-slate-500 hidden sm:inline text-[11px] font-semibold pl-1">Role:</span>
+            <select id="role-selector-dropdown" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer">
+              <option value="renter">👤 Student / Renter</option>
+              <option value="owner">🏠 Property Owner</option>
+              <option value="admin">🛡️ City Admin</option>
+              <option value="superadmin">👑 Super Admin</option>
+            </select>
+          </div>
+
+          <button onclick="App.switchView('owner-add')" class="hidden sm:flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md transition">
+            <i class="fa-solid fa-file-pen"></i> Post Ad
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION WITH HAZARIBAGH LOCALITY SEARCH -->
+  <div class="bg-gradient-to-b from-blue-900 via-indigo-900 to-slate-900 text-white pt-10 pb-16 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 px-3 py-1 rounded-full text-xs font-semibold text-blue-200 mb-4 backdrop-blur-md">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Hazaribagh's Direct Owner Booking Network
+      </div>
+      
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight mb-3">
+        हजारीबाग में रूम, हॉस्टल, फ्लैट, होटल और दुकान खोजें
+      </h1>
+      <p class="text-sm md:text-base text-slate-300 max-w-2xl mx-auto mb-8 font-light">
+        Matwari, Korrah (VBU), Babugaon, Hurhuru, Canary Hill एवं Main Road में बिना ब्रोकर सीधे ओनर से बात करें और GPS मैप पर देखें।
+      </p>
+
+      <!-- Search & Locality Filter Bar -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-2xl shadow-2xl max-w-4xl mx-auto text-slate-800 flex flex-col md:flex-row items-stretch gap-2 border border-white/20">
+        
+        <!-- Keyword search input -->
+        <div class="flex-1 flex items-center gap-2.5 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200">
+          <i class="fa-solid fa-magnifying-glass text-blue-600 text-sm"></i>
+          <input type="text" id="search-input" placeholder="Search VBU Hostel, 2BHK Flat, Main Road Shop, Lodge..." class="w-full bg-transparent text-xs md:text-sm focus:outline-none placeholder-slate-400 font-medium">
+        </div>
+
+        <!-- Locality Dropdown -->
+        <div class="w-full md:w-56 flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200">
+          <i class="fa-solid fa-location-dot text-red-500 text-sm"></i>
+          <select id="locality-filter-select" class="w-full bg-transparent text-xs md:text-sm font-semibold focus:outline-none cursor-pointer">
+            <option value="all">All Hazaribagh Areas</option>
+            <option value="Matwari">Matwari (Annada College)</option>
+            <option value="Korrah">Korrah (VBU University)</option>
+            <option value="Babugaon">Babugaon (Coaching Hub)</option>
+            <option value="Hurhuru">Hurhuru (Family Colony)</option>
+            <option value="Nawabganj">Nawabganj (Sadar Hospital)</option>
+            <option value="Canary Hill Road">Canary Hill Tourism</option>
+            <option value="Dipugarha">Dipugarha (St. Columba's)</option>
+            <option value="Jhanda Chowk">Jhanda Chowk (Main Road)</option>
+            <option value="District More">District More (Bus Stand)</option>
+            <option value="Okni / Lake Road">Okni (Hazaribagh Jheel)</option>
+          </select>
+        </div>
+
+        <!-- Search button -->
+        <button onclick="App.filterAndRenderProperties()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs md:text-sm flex items-center justify-center gap-2 shadow-lg transition">
+          <i class="fa-solid fa-search"></i> Search
+        </button>
+      </div>
+
+      <!-- Quick Category Chips -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mt-6">
+        <button data-category="all" class="category-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-md transition">
+          🌟 All Categories
+        </button>
+        <button data-category="student_hostel" class="category-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
+          🎓 Student Hostel
+        </button>
+        <button data-category="student_lodge" class="category-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
+          🚪 Lodge / To-Let Room
+        </button>
+        <button data-category="family_flat" class="category-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
+          🏢 Family Flat (Permanent)
+        </button>
+        <button data-category="hotel_stay" class="category-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
+          🏨 Hotel & Guest House
+        </button>
+        <button data-category="commercial_shop" class="category-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
+          🏪 Shop / Commercial Rent
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN BODY CONTENT -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ================= VIEW 1: PROPERTY LISTINGS GRID ================= -->
+    <section id="view-listings" class="view-section">
+      <!-- Section Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+            Verified Rentals & Stays in Hazaribagh
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Direct contact with owners via WhatsApp and phone call.</p>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <span id="results-count-badge" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+            Loading properties...
+          </span>
+          <button onclick="App.switchView('map')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow flex items-center gap-1.5">
+            <i class="fa-solid fa-map-marked-alt text-amber-400"></i> Open GPS Map
+          </button>
+        </div>
+      </div>
+
+      <!-- Properties Grid -->
+      <div id="properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: HAZARIBAGH INTERACTIVE GPS MAP ================= -->
+    <section id="view-map" class="view-section hidden">
+      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-xl md:text-2xl font-black text-slate-900">
+              <i class="fa-solid fa-map-location-dot text-blue-600"></i> Hazaribagh City GPS Map Explorer
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Click on pins to view room details, exact GPS coordinates, direct owner WhatsApp link, and driving directions.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="MapManager.locateUser()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-crosshairs"></i> Locate Me (GPS)
+            </button>
+            <button onclick="MapManager.flyToLocality('Matwari')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg">
+              Matwari
+            </button>
+            <button onclick="MapManager.flyToLocality('Korrah')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg">
+              Korrah (VBU)
+            </button>
+            <button onclick="MapManager.flyToLocality('Babugaon')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg">
+              Babugaon
+            </button>
+            <button onclick="MapManager.flyToLocality('Canary Hill Road')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg">
+              Canary Hill
+            </button>
+            <button onclick="MapManager.flyToLocality('Jhanda Chowk')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg">
+              Main Road
+            </button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex flex-wrap items-center gap-4 py-2 border-y border-slate-100 text-xs text-slate-600 mb-4">
+          <span class="font-bold text-slate-900">Map Legend:</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-purple-600 inline-block"></span> Student Hostel</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-cyan-500 inline-block"></span> Lodge / Room</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span> Family Flat</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span> Hotel / Stay</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-orange-600 inline-block"></span> Commercial Shop</span>
+        </div>
+
+        <!-- The Leaflet Map Container -->
+        <div id="hazaribagh-main-map" class="w-full shadow-inner border border-slate-200"></div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: OWNER MANUAL PROPERTY REGISTRATION ================= -->
+    <section id="view-owner-add" class="view-section hidden">
+      <div class="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl">
+        <div class="border-b border-slate-200 pb-5 mb-6">
+          <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+            <i class="fa-solid fa-house-chimney-medical"></i> Owner Manual Listing Portal
+          </div>
+          <h2 class="text-2xl font-black text-slate-900">
+            Register Property (रूम, हॉस्टल, फ्लैट, होटल या दुकान रजिस्टर करें)
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            Fill your property details manually. Set your exact GPS location on the map, provide your WhatsApp and phone number so students and tenants can reach you directly.
+          </p>
+        </div>
+
+        <form id="owner-property-form" class="space-y-6">
+          
+          <!-- Section 1: Basic Information -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">1</span>
+              Property Category & Details
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Select Property Category *</label>
+                <select name="category" required class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-semibold focus:ring-2 focus:ring-blue-500">
+                  <option value="student_hostel">🎓 Student Hostel (Boys / Girls Hostel)</option>
+                  <option value="student_lodge">🚪 Student Lodge / Single To-Let Room</option>
+                  <option value="family_flat">🏢 Family Flat (1BHK, 2BHK, 3BHK Permanent Residency)</option>
+                  <option value="hotel_stay">🏨 Hotel & Guest House (Visiting / Daily Booking)</option>
+                  <option value="commercial_shop">🏪 Commercial Shop / Office / Showroom for Rent</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Target Audience / Tenant Type *</label>
+                <select name="targetAudience" required class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-semibold focus:ring-2 focus:ring-blue-500">
+                  <option value="Boys Student">Boys Students only</option>
+                  <option value="Girls Student">Girls Students only</option>
+                  <option value="Family">Family only (Permanent Residency)</option>
+                  <option value="Bachelor / Working">Bachelor / Working Professionals</option>
+                  <option value="Business / Retail">Commercial / Retail Business</option>
+                  <option value="Tourists / Visitors">Visitors & Tourists</option>
+                </select>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Property Listing Title *</label>
+                <input type="text" name="title" required placeholder="e.g. Maa Saraswati Girls Hostel (Opposite Annada College) or 2BHK Flat Matwari" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500">
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Full Description & Rules</label>
+                <textarea name="description" rows="3" placeholder="Pani, bijli, mess timings, rules, distance from colleges, etc. likhein..." class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Pricing & Availability -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">2</span>
+              Rent Pricing & Capacity
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Rent Amount (₹) *</label>
+                <input type="number" name="price" required placeholder="3000" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Rent Period *</label>
+                <select name="pricePeriod" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-semibold">
+                  <option value="month">Per Month (प्रति माह)</option>
+                  <option value="day">Per Day (प्रति दिन - Hotels)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Security Deposit (₹)</label>
+                <input type="number" name="deposit" placeholder="0 if none" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Vacant Units / Rooms</label>
+                <input type="number" name="availableRooms" value="1" min="1" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Room / Space Type</label>
+                <input type="text" name="sharing" placeholder="e.g. Single Bed, 2BHK, 300 sq.ft" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+
+              <div class="flex items-center mt-5">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="foodIncluded" class="w-4 h-4 text-blue-600 rounded">
+                  <span class="text-xs font-bold text-slate-800">Mess / Food Included in Rent</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: GPS Location & Map Pin Picker -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">3</span>
+                Hazaribagh GPS Map Location (Click on Map to Set Pin)
+              </h3>
+              <div id="gps-coords-display" class="text-xs text-slate-600 font-mono">
+                Click map to set coordinates
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Hazaribagh Locality *</label>
+                <select id="prop-form-locality" name="locality" required class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold">
+                  <option value="Matwari">Matwari (Annada College Area)</option>
+                  <option value="Korrah">Korrah (Vinoba Bhave University)</option>
+                  <option value="Babugaon">Babugaon (Coaching Hub)</option>
+                  <option value="Hurhuru">Hurhuru (Family Residential)</option>
+                  <option value="Nawabganj">Nawabganj (Sadar Hospital Area)</option>
+                  <option value="Canary Hill Road">Canary Hill Tourism Road</option>
+                  <option value="Dipugarha">Dipugarha (St. Columba's Area)</option>
+                  <option value="Jhanda Chowk">Jhanda Chowk (Main Road Commercial)</option>
+                  <option value="District More">District More (Bus Stand)</option>
+                  <option value="Okni / Lake Road">Okni / Lake Road</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Landmark (लैंडमार्क) *</label>
+                <input type="text" name="landmark" required placeholder="e.g. Near Annada High School, 200m from VBU Gate" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Full Street Address</label>
+                <input type="text" name="address" required placeholder="House No, Road Name, Mohalla, Hazaribagh" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+            </div>
+
+            <!-- Leaflet Interactive Pin Picker Map -->
+            <div>
+              <p class="text-xs text-slate-500 mb-2 font-medium">
+                <i class="fa-solid fa-hand-pointer text-blue-600"></i> मैप पर कहीं भी क्लिक करें या रेड पिन को ड्रैग करके अपनी सही लोकेशन सेट करें:
+              </p>
+              <div id="owner-pin-picker-map" class="w-full border-2 border-slate-200"></div>
+              
+              <!-- Hidden coordinate inputs -->
+              <input type="hidden" id="prop-form-lat" name="lat" value="23.9967">
+              <input type="hidden" id="prop-form-lng" name="lng" value="85.3687">
+            </div>
+          </div>
+
+          <!-- Section 4: Amenities Checklist -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+            <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">4</span>
+              Select Available Amenities
+            </h3>
+            <div id="amenities-checkboxes-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Section 5: Owner Contact Details -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">5</span>
+              Owner Contact Information (सीधा संपर्क विवरण)
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Owner Name *</label>
+                <input type="text" name="ownerName" required placeholder="Aapka Naam" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp Number (For Direct Chat) *</label>
+                <div class="flex items-center">
+                  <span class="bg-slate-200 text-slate-700 px-3 py-2.5 rounded-l-xl text-xs font-bold">+91</span>
+                  <input type="tel" name="ownerWhatsapp" required placeholder="9431100000" class="w-full p-2.5 bg-white border border-slate-300 rounded-r-xl text-xs md:text-sm font-bold text-emerald-700">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Calling Phone Number *</label>
+                <input type="tel" name="ownerPhone" required placeholder="+919431100000" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Owner Email</label>
+                <input type="email" name="ownerEmail" placeholder="owner@gmail.com" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Property Photo URL (Optional)</label>
+                <input type="url" name="imageUrl" placeholder="https://... (Leave blank to use verified category photo)" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs md:text-sm">
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex items-center justify-end gap-3 pt-4">
+            <button type="button" onclick="App.switchView('listings')" class="px-6 py-3 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              Cancel
+            </button>
+            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-sm font-bold shadow-xl transition flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Submit & Publish Property
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 4: OWNER DASHBOARD & INQUIRIES ================= -->
+    <section id="view-owner-dashboard" class="view-section hidden">
+      <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <span class="bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-full">Owner Control Panel</span>
+            <h2 class="text-2xl font-black text-slate-900 mt-2">Meri Properties aur Inquiries</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Track your listed rooms, flats, shops, and direct student leads.</p>
+          </div>
+          <button onclick="App.switchView('owner-add')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Add New Listing
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- My Properties List -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-base text-slate-900 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-building text-blue-600"></i> My Listed Properties
+            </h3>
+            <div id="owner-properties-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Received Inquiries / Leads -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-base text-slate-900 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-comments text-emerald-600"></i> Customer & Student Messages (Leads)
+            </h3>
+            <div id="owner-inquiries-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 5: ADMIN DASHBOARD ================= -->
+    <section id="view-admin-view" class="view-section hidden">
+      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+          <div>
+            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">City Area Admin</span>
+            <h2 class="text-2xl font-black text-slate-900 mt-2">Hazaribagh Property Moderation</h2>
+            <p class="text-xs text-slate-500">Approve, reject, or mark properties as featured for top ranking.</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-500">City Moderator Active</span>
+          </div>
+        </div>
+
+        <!-- Admin Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-600 uppercase">
+                <th class="p-3">Property</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Owner & Phone</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-properties-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 6: SUPER ADMIN DASHBOARD ================= -->
+    <section id="view-superadmin-view" class="view-section hidden">
+      <div class="space-y-6">
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Total Properties</span>
+            <h3 id="stat-total-props" class="text-2xl font-black text-blue-600 mt-1">10</h3>
+            <span class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-up"></i> Live in Hazaribagh</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Active Approved</span>
+            <h3 id="stat-active-props" class="text-2xl font-black text-emerald-600 mt-1">10</h3>
+            <span class="text-[11px] text-slate-400">100% verified</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Registered Owners</span>
+            <h3 id="stat-total-owners" class="text-2xl font-black text-purple-600 mt-1">5</h3>
+            <span class="text-[11px] text-slate-400">Hostel & House Owners</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Total Inquiries</span>
+            <h3 id="stat-total-inquiries" class="text-2xl font-black text-amber-600 mt-1">3</h3>
+            <span class="text-[11px] text-slate-400">Direct Student Leads</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- User Roles Table -->
+          <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-base text-slate-900 mb-4 flex items-center justify-between">
+              <span><i class="fa-solid fa-users-gear text-blue-600"></i> User Role Management</span>
+              <span class="text-xs text-slate-400 font-normal">Super Admin Control</span>
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-600 uppercase">
+                    <th class="p-3">User</th>
+                    <th class="p-3">Current Role</th>
+                    <th class="p-3">Verification</th>
+                    <th class="p-3 text-right">Assign Role</th>
+                  </tr>
+                </thead>
+                <tbody id="superadmin-users-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Platform Settings Form -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-base text-slate-900 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-gear text-slate-600"></i> Platform Settings
+            </h3>
+            <form onsubmit="App.handleSettingsFormSubmit(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Announcement Banner</label>
+                <textarea name="announcement" rows="2" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs">हजारीबाग का #1 पोर्टल: रूम, हॉस्टल, लॉज, फ्लैट, होटल और दुकान खोजें!</textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Support WhatsApp</label>
+                <input type="text" name="supportWhatsapp" value="919431100000" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Support Phone</label>
+                <input type="text" name="supportPhone" value="+919431100000" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Support Email</label>
+                <input type="email" name="supportEmail" value="help@hazaribaghstay.in" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs">
+              </div>
+              <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-xs shadow">
+                Save Platform Settings
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= PROPERTY DETAIL MODAL ================= -->
+  <div id="property-detail-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 relative shadow-2xl">
+      <button onclick="App.closePropertyDetailModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center z-10 transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+      <div id="property-detail-modal-content">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DIRECT INQUIRY / MESSAGE MODAL ================= -->
+  <div id="inquiry-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
+      <button onclick="App.closeInquiryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="mb-4">
+        <span class="text-xs bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full">Send Inquiry</span>
+        <h3 id="inquiry-property-title" class="text-lg font-extrabold text-slate-900 mt-2 line-clamp-1">
+          Property Inquiry
+        </h3>
+        <p class="text-xs text-slate-500">Owner will receive your message and phone details immediately.</p>
+      </div>
+
+      <form onsubmit="App.handleInquirySubmit(event)" class="space-y-3">
+        <input type="hidden" id="inquiry-property-id">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Aapka Naam *</label>
+          <input type="text" id="inquiry-name" required placeholder="Rohan Sharma" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mobile / WhatsApp Number *</label>
+          <input type="tel" id="inquiry-phone" required placeholder="+918709123456" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email ID</label>
+          <input type="email" id="inquiry-email" placeholder="student@gmail.com" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Aapka Sawal ya Message *</label>
+          <textarea id="inquiry-message" rows="3" required placeholder="Kab se room khali hai? Rent me discount ho sakta hai kya?" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
+          <i class="fa-solid fa-paper-plane"></i> Send Direct Message
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= AI CHATBOT: HAZARIBAGH MITRA ================= -->
+  <div id="chatbot-wrapper" class="fixed bottom-5 right-5 z-40">
+    <!-- Chat Window Box -->
+    <div id="chatbot-window" class="chat-window hidden w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col mb-4">
+      
+      <!-- Chat Header -->
+      <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm leading-tight">Hazaribagh Mitra AI</h4>
+            <p class="text-[10px] text-blue-200 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online • Local Guide
+            </p>
+          </div>
+        </div>
+        <button onclick="Chatbot.toggle()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div class="p-2.5 bg-slate-100 border-b border-slate-200 flex gap-1.5 overflow-x-auto text-[11px] whitespace-nowrap">
+        <button onclick="Chatbot.sendQuickChip('VBU Boys Hostel')" class="bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-2.5 py-1 rounded-full border border-slate-200 font-medium">
+          🎓 VBU Hostel
+        </button>
+        <button onclick="Chatbot.sendQuickChip('Matwari Girls Hostel')" class="bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-2.5 py-1 rounded-full border border-slate-200 font-medium">
+          🌸 Girls PG Matwari
+        </button>
+        <button onclick="Chatbot.sendQuickChip('Single room under 2500')" class="bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-2.5 py-1 rounded-full border border-slate-200 font-medium">
+          🚪 Low Budget Lodge
+        </button>
+        <button onclick="Chatbot.sendQuickChip('2BHK Family Flat')" class="bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-2.5 py-1 rounded-full border border-slate-200 font-medium">
+          🏢 2BHK Flat
+        </button>
+        <button onclick="Chatbot.sendQuickChip('Commercial shop Main Road')" class="bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-2.5 py-1 rounded-full border border-slate-200 font-medium">
+          🏪 Shop for Rent
+        </button>
+      </div>
+
+      <!-- Messages Scroll Area -->
+      <div id="chat-messages-container" class="p-4 h-72 overflow-y-auto text-xs space-y-3 bg-slate-50">
+        <!-- Rendered by chatbot.js -->
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+        <input type="text" id="chatbot-input" onkeypress="if(event.key === 'Enter') Chatbot.sendQuery()" placeholder="Poochhein (e.g. Matwari me room chahiye)..." class="flex-1 bg-slate-100 px-3 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-600">
+        <button onclick="Chatbot.sendQuery()" class="w-8 h-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-xs shadow">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Floating Launcher Buttons Bar -->
+    <div class="flex items-center gap-2">
+      <!-- Direct WhatsApp Floating Help -->
+      <a href="https://wa.me/919431100000?text=Namaste!%20Mujhe%20Hazaribagh%20me%20room%2Fhostel%20ke%20liye%20help%20chahiye" target="_blank" class="floating-widget bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition" title="WhatsApp Platform Help">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+      </a>
+
+      <!-- AI Chatbot Floating Trigger -->
+      <button onclick="Chatbot.toggle()" class="floating-widget bg-blue-600 hover:bg-blue-700 text-white px-4 h-12 rounded-full flex items-center gap-2 shadow-lg transition">
+        <i class="fa-solid fa-robot text-lg"></i>
+        <span class="text-xs font-bold hidden sm:inline">Ask Mitra AI</span>
+        <span id="chat-notification-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-10 mt-16 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <div class="flex items-center gap-2 text-white font-black text-lg mb-2">
+          <i class="fa-solid fa-hotel text-blue-500"></i> Hazaribagh<span class="text-blue-500">Stay</span>
+        </div>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Jharkhand's dedicated rental platform connecting students, families, tourists, and business owners in Hazaribagh directly with property owners.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Rental Categories</h4>
+        <ul class="space-y-1.5">
+          <li><a href="#" onclick="App.activeCategoryFilter='student_hostel'; App.filterAndRenderProperties(); return false;" class="hover:text-white">Student Hostels (VBU & Annada)</a></li>
+          <li><a href="#" onclick="App.activeCategoryFilter='student_lodge'; App.filterAndRenderProperties(); return false;" class="hover:text-white">Lodges & To-Let Rooms</a></li>
+          <li><a href="#" onclick="App.activeCategoryFilter='family_flat'; App.filterAndRenderProperties(); return false;" class="hover:text-white">Family Flats (Permanent Residency)</a></li>
+          <li><a href="#" onclick="App.activeCategoryFilter='hotel_stay'; App.filterAndRenderProperties(); return false;" class="hover:text-white">Hotels & Guest Houses (Visiting)</a></li>
+          <li><a href="#" onclick="App.activeCategoryFilter='commercial_shop'; App.filterAndRenderProperties(); return false;" class="hover:text-white">Commercial Shops & Offices</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Hazaribagh Localities</h4>
+        <ul class="space-y-1.5">
+          <li><a href="#" onclick="App.switchView('map'); MapManager.flyToLocality('Matwari'); return false;" class="hover:text-white">Matwari (Annada College Area)</a></li>
+          <li><a href="#" onclick="App.switchView('map'); MapManager.flyToLocality('Korrah'); return false;" class="hover:text-white">Korrah (Vinoba Bhave University)</a></li>
+          <li><a href="#" onclick="App.switchView('map'); MapManager.flyToLocality('Babugaon'); return false;" class="hover:text-white">Babugaon (Coaching Hub)</a></li>
+          <li><a href="#" onclick="App.switchView('map'); MapManager.flyToLocality('Hurhuru'); return false;" class="hover:text-white">Hurhuru (Residential Colony)</a></li>
+          <li><a href="#" onclick="App.switchView('map'); MapManager.flyToLocality('Jhanda Chowk'); return false;" class="hover:text-white">Jhanda Chowk / Main Road</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Platform Support & Help</h4>
+        <p class="mb-1"><i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp: +91-9431100000</p>
+        <p class="mb-1"><i class="fa-solid fa-phone text-blue-400"></i> Call: +91-9431100000</p>
+        <p class="mb-1"><i class="fa-solid fa-envelope text-amber-400"></i> help@hazaribaghstay.in</p>
+        <p class="text-[11px] text-slate-500 mt-2">📍 Hazaribagh, Jharkhand - 825301</p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 text-center border-t border-slate-800 pt-6 text-slate-500">
+      &copy; 2026 Apna Hazaribagh Stay & Rent Portal. Built for Students, Families & Property Owners.
+    </div>
+  </footer>
+
+  <!-- App Scripts -->
+  <script src="/js/data.js"></script>
+  <script src="/js/map.js"></script>
+  <script src="/js/chatbot.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

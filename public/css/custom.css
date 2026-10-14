@@ -1,0 +1,154 @@
+/* Custom CSS for Hazaribagh Stay Portal */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rozha+One&display=swap');
+
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --accent: #f59e0b;
+  --hostel-color: #8b5cf6;
+  --lodge-color: #06b6d4;
+  --flat-color: #3b82f6;
+  --hotel-color: #10b981;
+  --shop-color: #f97316;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  scroll-behavior: smooth;
+  background-color: #f8fafc;
+}
+
+/* Glassmorphism effects */
+.glass-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Category Badge gradients */
+.badge-student_hostel {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  color: white;
+}
+.badge-student_lodge {
+  background: linear-gradient(135deg, #0284c7, #06b6d4);
+  color: white;
+}
+.badge-family_flat {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+}
+.badge-hotel_stay {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white;
+}
+.badge-commercial_shop {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  color: white;
+}
+
+/* Leaflet Custom Marker Icons */
+.custom-div-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.custom-div-icon:hover {
+  transform: scale(1.15);
+}
+
+/* Leaflet Popup Styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+}
+.leaflet-popup-content {
+  margin: 8px 12px;
+  line-height: 1.4;
+}
+
+/* Map Containers */
+#hazaribagh-main-map {
+  height: 600px;
+  border-radius: 16px;
+  z-index: 10;
+}
+
+#owner-pin-picker-map {
+  height: 320px;
+  border-radius: 12px;
+  z-index: 5;
+}
+
+/* Pulse Animation for Available Badges */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 0.4; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+.pulse-available::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  margin-right: 6px;
+  animation: pulse-ring 2s infinite ease-in-out;
+}
+
+/* Floating Action Buttons */
+.floating-widget {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease-in-out;
+}
+.floating-widget:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Chatbot styles */
+.chat-window {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-bubble-user {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border-top-right-radius: 4px;
+}
+
+.chat-bubble-bot {
+  background: #f1f5f9;
+  color: #1e293b;
+  border-top-left-radius: 4px;
+}

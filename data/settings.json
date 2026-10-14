@@ -1,0 +1,16 @@
+{
+  "siteName": "Apna Hazaribagh Stay & To-Let Hub",
+  "tagline": "हजारीबाग का #1 हॉस्टल, लॉज, फ्लैट, होटल एवं दुकान रेंटल पोर्टल",
+  "supportPhone": "+919431100000",
+  "supportWhatsapp": "919431100000",
+  "supportEmail": "help@hazaribaghstay.in",
+  "studentHelpline": "+919835099999",
+  "announcement": "📢 Welcome to Hazaribagh To-Let Hub! Verified Student Hostels, Family Flats, and Commercial Shops with GPS Map Tracking & Direct Owner WhatsApp Contact.",
+  "listingVerificationRequired": false,
+  "commissionPercentage": 0,
+  "cityCentreCoordinates": {
+    "lat": 23.9967,
+    "lng": 85.3687,
+    "zoom": 13
+  }
+}
