@@ -231,6 +231,37 @@ app.get('/api/users', (req, res) => {
   res.json({ success: true, data: users });
 });
 
+// User & Admin Login endpoint
+app.post('/api/auth/login', (req, res) => {
+  const { email, password, pin, role } = req.body;
+  const users = readJson(USERS_FILE, []);
+
+  let user = null;
+  if (email) {
+    user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase().trim());
+  } else if (role) {
+    user = users.find(u => u.role === role);
+  }
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'User not found. Please check your email or role.' });
+  }
+
+  if (password && user.password && user.password !== password.trim()) {
+    return res.status(401).json({ success: false, message: 'Incorrect password.' });
+  }
+
+  if (pin && user.pin && user.pin !== pin.trim()) {
+    return res.status(401).json({ success: false, message: 'Incorrect PIN.' });
+  }
+
+  res.json({
+    success: true,
+    message: `Login successful as ${user.name}`,
+    user: user
+  });
+});
+
 app.post('/api/users/register', (req, res) => {
   const users = readJson(USERS_FILE, []);
   const newUser = {

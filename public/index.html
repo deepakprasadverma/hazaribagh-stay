@@ -96,10 +96,16 @@
           </button>
         </nav>
 
-        <!-- Role Switcher & Profile Dropdown (For testing all 4 user perspectives) -->
-        <div class="flex items-center gap-3">
-          <div class="bg-slate-100 hover:bg-slate-200 p-1.5 rounded-xl border border-slate-200 flex items-center gap-2 text-xs">
-            <span class="text-slate-500 hidden sm:inline text-[11px] font-semibold pl-1">Role:</span>
+        <!-- Admin Access, Role Indicator & Action Buttons -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Quick Admin Login Button -->
+          <button onclick="App.openAdminLoginModal()" id="header-admin-login-btn" class="flex items-center gap-1.5 bg-gradient-to-r from-slate-900 to-indigo-900 hover:from-black hover:to-indigo-950 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition">
+            <i class="fa-solid fa-key text-amber-400"></i>
+            <span class="hidden sm:inline">Admin Access</span>
+          </button>
+
+          <!-- Current Logged In Role Badge & Switcher -->
+          <div class="bg-slate-100 hover:bg-slate-200 p-1 sm:p-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5 text-xs">
             <select id="role-selector-dropdown" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer">
               <option value="renter">👤 Student / Renter</option>
               <option value="owner">🏠 Property Owner</option>
@@ -108,7 +114,12 @@
             </select>
           </div>
 
-          <button onclick="App.switchView('owner-add')" class="hidden sm:flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md transition">
+          <!-- Logout Button (Shown when logged in as Owner/Admin/SuperAdmin) -->
+          <button onclick="App.logout()" id="header-logout-btn" class="hidden text-xs bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2.5 py-2 rounded-xl transition" title="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+
+          <button onclick="App.switchView('owner-add')" class="hidden md:flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md transition">
             <i class="fa-solid fa-file-pen"></i> Post Ad
           </button>
         </div>
@@ -700,6 +711,117 @@
 
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
           <i class="fa-solid fa-paper-plane"></i> Send Direct Message
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ADMIN & SUPER ADMIN LOGIN MODAL ================= -->
+  <div id="admin-login-modal" class="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl border border-slate-200 my-auto">
+      <button onclick="App.closeAdminLoginModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg text-2xl">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 class="text-xl sm:text-2xl font-black text-slate-900">Admin & Management Access</h3>
+        <p class="text-xs text-slate-500 mt-1">Hazaribagh Stay Hub Secure Portal (City Admin & Super Admin)</p>
+      </div>
+
+      <!-- Quick 1-Click Access Cards (Instant Evaluation) -->
+      <div class="space-y-3 mb-6">
+        <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Instant 1-Click Access
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Super Admin Quick Button -->
+          <div class="p-3.5 bg-amber-50/90 hover:bg-amber-100 border border-amber-200 rounded-2xl transition cursor-pointer flex flex-col justify-between" onclick="App.quickLogin('superadmin')">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-extrabold text-xs text-amber-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-crown text-amber-500"></i> Super Admin
+                </span>
+                <span class="text-[10px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-bold">Full Access</span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">User management, global analytics, system controls.</p>
+              <div class="mt-2 text-[10px] font-mono text-slate-600 bg-white/80 p-1 rounded border border-amber-100">
+                PIN: <b>9999</b> • Pass: <b>superadmin123</b>
+              </div>
+            </div>
+            <button class="mt-3 w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-1.5 rounded-xl shadow-sm">
+              Open Super Admin →
+            </button>
+          </div>
+
+          <!-- City Admin Quick Button -->
+          <div class="p-3.5 bg-blue-50/90 hover:bg-blue-100 border border-blue-200 rounded-2xl transition cursor-pointer flex flex-col justify-between" onclick="App.quickLogin('admin')">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-extrabold text-xs text-blue-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-halved text-blue-600"></i> City Admin
+                </span>
+                <span class="text-[10px] bg-blue-200 text-blue-900 px-1.5 py-0.5 rounded font-bold">Moderator</span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">Approve/reject property listings, feature rooms.</p>
+              <div class="mt-2 text-[10px] font-mono text-slate-600 bg-white/80 p-1 rounded border border-blue-100">
+                PIN: <b>1234</b> • Pass: <b>admin123</b>
+              </div>
+            </div>
+            <button class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 rounded-xl shadow-sm">
+              Open City Admin →
+            </button>
+          </div>
+        </div>
+
+        <!-- Property Owner Quick Button -->
+        <div class="p-3 bg-purple-50/90 hover:bg-purple-100 border border-purple-200 rounded-2xl transition cursor-pointer flex items-center justify-between" onclick="App.quickLogin('owner')">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm shadow">
+              <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div>
+              <p class="text-xs font-extrabold text-purple-900">Property Owner Portal</p>
+              <p class="text-[11px] text-slate-600">PIN: <b>5678</b> • Pass: <b>owner123</b></p>
+            </div>
+          </div>
+          <button class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm">
+            Open Owner Portal →
+          </button>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="relative my-4">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+        <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-semibold">Or Sign In with Email / PIN</span></div>
+      </div>
+
+      <!-- Manual Form Login -->
+      <form onsubmit="App.handleLoginSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email or Username</label>
+          <input type="text" id="login-email" placeholder="superadmin@hazaribaghstay.in or admin.hazaribagh@stayhub.in" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <input type="password" id="login-password" placeholder="superadmin123 / admin123" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Or 4-Digit PIN</label>
+            <input type="text" id="login-pin" maxlength="4" placeholder="9999 / 1234" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-center tracking-widest">
+          </div>
+        </div>
+
+        <div id="login-error-msg" class="text-xs text-red-600 font-semibold hidden"></div>
+
+        <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-lock-open"></i> Authenticate & Enter Dashboard
         </button>
       </form>
     </div>

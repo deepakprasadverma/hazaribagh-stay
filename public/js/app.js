@@ -16,7 +16,15 @@ const App = {
     await this.loadSettings();
     this.setupCurrentUser('user-renter-1'); // Default to Student/Renter
     this.bindEvents();
-    this.switchView('listings');
+    
+    // Check initial hash route
+    if (window.location.hash) {
+      this.handleHashRoute();
+    } else {
+      this.switchView('listings');
+    }
+    window.addEventListener('hashchange', () => this.handleHashRoute());
+
     Chatbot.init();
     await this.loadProperties();
   },
@@ -80,6 +88,8 @@ const App = {
     const roleBadge = document.getElementById('current-user-role-badge');
     const userNameEl = document.getElementById('current-user-name');
     const roleSelector = document.getElementById('role-selector-dropdown');
+    const logoutBtn = document.getElementById('header-logout-btn');
+    const adminLoginBtn = document.getElementById('header-admin-login-btn');
 
     if (roleBadge) {
       const rolesMap = {
@@ -111,6 +121,142 @@ const App = {
     document.querySelectorAll('.superadmin-only').forEach(el => {
       el.style.display = (this.currentUser.role === 'superadmin') ? '' : 'none';
     });
+
+    // Update Header Admin Button & Logout Button
+    if (logoutBtn) {
+      logoutBtn.style.display = this.currentUser.role !== 'renter' ? 'flex' : 'none';
+    }
+
+    if (adminLoginBtn) {
+      if (this.currentUser.role === 'superadmin') {
+        adminLoginBtn.innerHTML = '<i class="fa-solid fa-crown text-amber-300"></i> <span class="hidden sm:inline">Super Admin Active</span>';
+        adminLoginBtn.className = 'flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+      } else if (this.currentUser.role === 'admin') {
+        adminLoginBtn.innerHTML = '<i class="fa-solid fa-shield-halved text-blue-300"></i> <span class="hidden sm:inline">City Admin Active</span>';
+        adminLoginBtn.className = 'flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+      } else if (this.currentUser.role === 'owner') {
+        adminLoginBtn.innerHTML = '<i class="fa-solid fa-user-tie text-purple-300"></i> <span class="hidden sm:inline">Owner Active</span>';
+        adminLoginBtn.className = 'flex items-center gap-1.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+      } else {
+        adminLoginBtn.innerHTML = '<i class="fa-solid fa-key text-amber-400"></i> <span class="hidden sm:inline">Admin Access</span>';
+        adminLoginBtn.className = 'flex items-center gap-1.5 bg-gradient-to-r from-slate-900 to-indigo-900 hover:from-black hover:to-indigo-950 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+      }
+    }
+  },
+
+  openAdminLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) modal.classList.remove('hidden');
+    const err = document.getElementById('login-error-msg');
+    if (err) err.classList.add('hidden');
+  },
+
+  closeAdminLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  async quickLogin(role) {
+    let target = this.users.find(u => u.role === role);
+    if (!target) {
+      target = { id: 'temp-' + role, name: role.toUpperCase(), role };
+    }
+    this.currentUser = target;
+    this.updateRoleUI();
+    this.closeAdminLoginModal();
+
+    if (role === 'superadmin') {
+      window.location.hash = '#superadmin';
+      this.switchView('superadmin-view');
+    } else if (role === 'admin') {
+      window.location.hash = '#admin';
+      this.switchView('admin-view');
+    } else if (role === 'owner') {
+      window.location.hash = '#owner';
+      this.switchView('owner-dashboard');
+    } else {
+      window.location.hash = '';
+      this.switchView('listings');
+    }
+  },
+
+  async handleLoginSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    const pin = document.getElementById('login-pin').value.trim();
+    const errorEl = document.getElementById('login-error-msg');
+
+    if (!email && !pin) {
+      errorEl.textContent = 'Please provide an Email or 4-digit PIN.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const res = await API.login({ email, password, pin });
+      if (res.success && res.user) {
+        this.currentUser = res.user;
+        this.updateRoleUI();
+        this.closeAdminLoginModal();
+
+        if (this.currentUser.role === 'superadmin') {
+          window.location.hash = '#superadmin';
+          this.switchView('superadmin-view');
+        } else if (this.currentUser.role === 'admin') {
+          window.location.hash = '#admin';
+          this.switchView('admin-view');
+        } else if (this.currentUser.role === 'owner') {
+          window.location.hash = '#owner';
+          this.switchView('owner-dashboard');
+        } else {
+          window.location.hash = '';
+          this.switchView('listings');
+        }
+      } else {
+        errorEl.textContent = res.message || 'Authentication failed. Please verify credentials.';
+        errorEl.classList.remove('hidden');
+      }
+    } catch (err) {
+      errorEl.textContent = 'Network or server error during login.';
+      errorEl.classList.remove('hidden');
+    }
+  },
+
+  logout() {
+    this.switchRole('renter');
+    window.location.hash = '';
+    this.switchView('listings');
+    alert('Logged out. Returned to Student/Renter view.');
+  },
+
+  handleHashRoute() {
+    const hash = window.location.hash.toLowerCase();
+    if (hash === '#admin') {
+      if (this.currentUser.role !== 'admin' && this.currentUser.role !== 'superadmin') {
+        this.openAdminLoginModal();
+      } else {
+        this.switchView('admin-view');
+      }
+    } else if (hash === '#superadmin') {
+      if (this.currentUser.role !== 'superadmin') {
+        this.openAdminLoginModal();
+      } else {
+        this.switchView('superadmin-view');
+      }
+    } else if (hash === '#owner') {
+      if (this.currentUser.role !== 'owner' && this.currentUser.role !== 'admin' && this.currentUser.role !== 'superadmin') {
+        this.openAdminLoginModal();
+      } else {
+        this.switchView('owner-dashboard');
+      }
+    } else if (hash === '#map') {
+      this.switchView('map');
+    } else if (hash === '#add' || hash === '#post') {
+      this.switchView('owner-add');
+    } else if (hash === '' || hash === '#listings') {
+      this.switchView('listings');
+    }
   },
 
   switchView(viewName) {

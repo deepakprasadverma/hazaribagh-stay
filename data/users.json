@@ -6,6 +6,8 @@
     "phone": "+918210987654",
     "whatsapp": "918210987654",
     "email": "amit.student.vbu@gmail.com",
+    "password": "renter123",
+    "pin": "0000",
     "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
     "joined": "2026-08-10"
   },
@@ -16,6 +18,8 @@
     "phone": "+919431123456",
     "whatsapp": "919431123456",
     "email": "ramesh.vbu.hostel@gmail.com",
+    "password": "owner123",
+    "pin": "5678",
     "avatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80",
     "isVerified": true,
     "joined": "2026-07-01",
@@ -28,6 +32,8 @@
     "phone": "+919835012345",
     "whatsapp": "919835012345",
     "email": "admin.hazaribagh@stayhub.in",
+    "password": "admin123",
+    "pin": "1234",
     "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
     "isVerified": true,
     "joined": "2026-05-15"
@@ -39,6 +45,8 @@
     "phone": "+919999999999",
     "whatsapp": "919999999999",
     "email": "superadmin@hazaribaghstay.in",
+    "password": "superadmin123",
+    "pin": "9999",
     "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80",
     "isVerified": true,
     "joined": "2026-01-01"
