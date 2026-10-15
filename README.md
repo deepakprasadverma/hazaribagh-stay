@@ -1,6 +1,6 @@
-# 🏠 Addix Stay - Hazaribagh Rental & Booking Hub (हजारीबाग स्टे एवं रेंट पोर्टल)
+# 🏠 Addix Stay - Stay & Rental Portal (स्टे एवं रेंटल पोर्टल)
 
-Jharkhand's premier all-in-one accommodation, rental, and commercial property portal tailored specifically for **Hazaribagh** (हजारीबाग). Official Contact / WhatsApp: **+91-7631740228**.
+Jharkhand's premier all-in-one accommodation, rental, and commercial property portal, launched initially in **Hazaribagh** (हजारीबाग) and designed for expansion across all districts of Jharkhand. Official Contact / WhatsApp: **+91-7631740228**.
 
 ---
 
