@@ -8,7 +8,7 @@ const Chatbot = {
     this.messages = [
       {
         sender: 'bot',
-        text: `🙏 <b>Namaste! Main Hazaribagh Mitra hoon.</b><br>Main aapko Hazaribagh me best <b>Student Hostel, Lodge, Family Flat, Hotel</b> ya <b>Shop for Rent</b> dhundhne me turant madad kar sakta hoon.<br><br>Aap mujhse Hinglish, Hindi ya English me kuch bhi pooch sakte hain!`
+        text: `🙏 <b>Namaste! Main Addix Stay Assistant hoon.</b><br>Main aapko Hazaribagh me best <b>Student Hostel, Lodge, Family Flat, Hotel</b> ya <b>Shop for Rent</b> dhundhne me turant madad kar sakta hoon.<br><br>Aap mujhse Hinglish, Hindi ya English me kuch bhi pooch sakte hain!`
       }
     ];
     this.renderMessages();

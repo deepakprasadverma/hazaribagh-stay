@@ -115,9 +115,9 @@ app.post('/api/properties', (req, res) => {
     amenities: Array.isArray(req.body.amenities) ? req.body.amenities : [],
     ownerId: req.body.ownerId || 'owner-1',
     ownerName: req.body.ownerName || 'Property Owner',
-    ownerPhone: req.body.ownerPhone || '+919431100000',
-    ownerWhatsapp: req.body.ownerWhatsapp || '919431100000',
-    ownerEmail: req.body.ownerEmail || 'owner@hazaribaghstay.in',
+    ownerPhone: req.body.ownerPhone || '+917631740228',
+    ownerWhatsapp: req.body.ownerWhatsapp || '917631740228',
+    ownerEmail: req.body.ownerEmail || 'contact@addixstay.in',
     images: Array.isArray(req.body.images) && req.body.images.length > 0 
       ? req.body.images 
       : ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80'],
@@ -369,7 +369,7 @@ app.post('/api/chatbot', (req, res) => {
 
   // Construct intelligent response in natural Hinglish
   if (q.includes('hello') || q.includes('hi') || q.includes('namaste') || q.includes('pranam')) {
-    reply = `Namaste! 🙏 Main aapka Hazaribagh Stay Assistant hoon. Main aapko VBU, Annada College, Matwari, Korrah ya poore Hazaribagh me best Student Hostel, Lodge, Family Flat, Hotel aur Shop dhundhne me madad kar sakta hoon! Aapko kis type ki property chahiye?`;
+    reply = `Namaste! 🙏 Main aapka Addix Stay Assistant hoon. Main aapko VBU, Annada College, Matwari, Korrah ya poore Hazaribagh me best Student Hostel, Lodge, Family Flat, Hotel aur Shop dhundhne me madad kar sakta hoon! Aapko kis type ki property chahiye?`;
   } else if (matchedProperties.length > 0) {
     const top = matchedProperties.slice(0, 3);
     const names = top.map(p => `• <b>${p.title}</b> (${p.locality}) - ₹${p.price}/${p.pricePeriod}`).join('<br>');
@@ -377,7 +377,7 @@ app.post('/api/chatbot', (req, res) => {
   } else if (q.includes('price') || q.includes('budget') || q.includes('rent') || q.includes('kam kharch')) {
     reply = `Hazaribagh me student lodges ₹1,500 - ₹2,500/month se start hoti hain. Hostels with 4-time food ₹3,200 - ₹4,000/month me available hain. Family flats ₹7,000 - ₹15,000/month me milte hain. Aap hamare filter se apna budget set kar sakte hain!`;
   } else if (q.includes('contact') || q.includes('phone') || q.includes('whatsapp') || q.includes('help')) {
-    reply = `Aap kisi bhi property ke card par <b>WhatsApp Chat</b> ya <b>Call Owner</b> button daba kar seedhe owner se baat kar sakte hain. Platform helpline WhatsApp number: <b>+91-9431100000</b> hai!`;
+    reply = `Aap kisi bhi property ke card par <b>WhatsApp Chat</b> ya <b>Call Owner</b> button daba kar seedhe owner se baat kar sakte hain. Platform helpline WhatsApp number: <b>+91-7631740228</b> hai!`;
   } else {
     reply = `Aap Hazaribagh ke kisi bhi area jaise Matwari, Korrah, Babugaon, Hurhuru ya Main Road me Hostel, Flat, Lodge, Hotel ya Shop khoj sakte hain. Neeche diye gaye quick buttons par click karein ya apna requirement batayein!`;
   }
@@ -399,8 +399,9 @@ app.use((req, res) => {
 if (require.main === module || !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`====================================================`);
-    console.log(`  🏠 Apna Hazaribagh Stay & To-Let Hub Server Running`);
+    console.log(`  🏠 Addix Stay - Hazaribagh Hub Server Running`);
     console.log(`  🌐 URL: http://localhost:${PORT}`);
+    console.log(`  📱 WhatsApp: +91-7631740228`);
     console.log(`  📍 Center: Hazaribagh, Jharkhand (GPS: 23.9967, 85.3687)`);
     console.log(`====================================================`);
   });
