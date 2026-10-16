@@ -1,6 +1,11 @@
 # 🏠 Addix Stay - Stay & Rental Portal (स्टे एवं रेंटल पोर्टल)
 
-Jharkhand's premier all-in-one accommodation, rental, and commercial property portal, launched initially in **Hazaribagh** (हजारीबाग) and designed for expansion across all districts of Jharkhand. Official Contact / WhatsApp: **+91-7631740228**.
+Jharkhand's premier all-in-one accommodation, rental, and commercial property portal, launched initially in **Hazaribagh** (हजारीबाग) and architected for expansion across all 24 districts of Jharkhand.
+
+- 🌐 **Live Website (Vercel)**: [https://hazaribagh-stay.vercel.app](https://hazaribagh-stay.vercel.app)
+- 🐙 **GitHub Repository**: [https://github.com/deepakprasadverma/hazaribagh-stay](https://github.com/deepakprasadverma/hazaribagh-stay)
+- 📱 **Official Helpline / WhatsApp**: **+91-7631740228**
+- ✉️ **Support Email**: `contact@addixstay.in`
 
 ---
 
@@ -29,16 +34,17 @@ Jharkhand's premier all-in-one accommodation, rental, and commercial property po
    - Owner dashboard to track live properties, edit/delete, and manage incoming leads with 1-click WhatsApp reply!
 
 4. **Instant Direct Contact (WhatsApp, Call & Email)**:
-   - 🟢 1-Click WhatsApp Chat (`https://wa.me/...`) with pre-filled message.
-   - 📞 Direct Phone Call button (`tel:...`).
+   - 🟢 1-Click WhatsApp Chat (`https://wa.me/917631740228`) with pre-filled message.
+   - 📞 Direct Phone Call button (`tel:+917631740228`).
    - ✉️ Direct Inquiry Modal saving leads in database.
 
-5. **Multi-Role Support (Renter, Owner, Admin & Super Admin)**:
-   - Instant Header Role Switcher for live testing:
-     - 👤 **Student / Renter**: Browse, search, filter, contact owners, chat with AI bot.
-     - 🏠 **Property Owner**: Add properties manually, track listings, reply to inquiries.
-     - 🛡️ **City Admin**: Verify, approve, reject, feature/unfeature listings.
-     - 👑 **Super Admin**: Complete city analytics, assign user roles, update platform settings & broadcast banners.
+5. **Discreet & Secure Admin Access (Hidden Portals)**:
+   - Regular public visitors only see public roles (**Student / Renter** & **Property Owner**).
+   - Admin and Super Admin access are securely hidden and can be accessed via:
+     - ⌨️ **Keyboard Shortcut**: `Ctrl + Shift + A` (or `Alt + A`).
+     - 🔗 **Direct URL Hash**: `/#superadmin`, `/#admin`, or `/#admin-portal`.
+     - 🦶 **Footer Link**: Discreet `Staff Portal` link in footer.
+     - 🖱️ **Logo Triple-Click**: 3 consecutive clicks on the top "Addix Stay" logo.
 
 6. **🤖 "Hazaribagh Mitra" - AI Chat Assistant**:
    - Intelligent floating assistant speaking Hinglish, Hindi, and English.
@@ -47,22 +53,32 @@ Jharkhand's premier all-in-one accommodation, rental, and commercial property po
 
 ---
 
-## 🚀 How to Run the Website (वेबसाइट कैसे चलाएं)
+## 🔐 Demo Credentials (लॉगिन विवरण)
 
-### 1. Requirements:
-- Node.js (v18+)
-- Browser (Chrome, Edge, Firefox)
+| Role | Email ID / Username | Password | 4-Digit Quick PIN | Access Level |
+| :--- | :--- | :--- | :--- | :--- |
+| 👑 **Super Admin** | `superadmin@addixstay.in` | `superadmin123` | **`9999`** | Full platform analytics, settings, district expansion |
+| 🛡️ **City Admin** | `admin.hazaribagh@stayhub.in` | `admin123` | **`1234`** | Property approvals, moderation, featured badges |
+| 🏠 **Property Owner** | `ramesh.vbu.hostel@gmail.com` | `owner123` | **`5678`** | Post property, manage rooms, track student inquiries |
+| 👤 **Student / Renter** | *Default Public Access* | *None* | *None* | Browse listings, GPS map search, direct WhatsApp contact |
 
-### 2. Start the Server:
+---
+
+## 🚀 How to Run Locally (लोकल सर्वर शुरू करें)
+
 ```powershell
-cd C:\Users\User\.gemini\antigravity\scratch\hazaribagh-stay
-node server.js
+# 1. Clone repository
+git clone https://github.com/deepakprasadverma/hazaribagh-stay.git
+cd hazaribagh-stay
+
+# 2. Install dependencies
+npm install
+
+# 3. Start local development server
+npm start
 ```
 
-### 3. Open in Browser:
-```
-http://localhost:3000
-```
+Open **`http://localhost:3000`** in your browser.
 
 ---
 
@@ -71,10 +87,11 @@ http://localhost:3000
 ```
 hazaribagh-stay/
 ├── server.js               # Node.js Express Backend REST API
-├── package.json            # Node.js Dependencies
+├── package.json            # Node.js Dependencies & NPM Scripts
+├── vercel.json             # Vercel Serverless & SPA routing config
 ├── README.md               # Complete Documentation & Guide
 ├── data/
-│   ├── properties.json     # Pre-seeded Hazaribagh property listings
+│   ├── properties.json     # Pre-seeded property listings
 │   ├── users.json          # Demo user accounts (Renter, Owner, Admin, Super Admin)
 │   ├── inquiries.json      # Inquiries and student lead messages
 │   └── settings.json       # Platform helpline, banners, and map settings
@@ -84,7 +101,7 @@ hazaribagh-stay/
     │   └── custom.css      # Glassmorphism, animations, Leaflet map styles
     └── js/
         ├── app.js          # App controller, role switcher, filtering, modals
-        ├── map.js          # Leaflet Hazaribagh GPS map & pin picker
+        ├── map.js          # Leaflet GPS map & interactive pin picker
         ├── chatbot.js      # Hazaribagh Mitra AI chatbot logic
         └── data.js         # Localities metadata, categories, API client
 ```

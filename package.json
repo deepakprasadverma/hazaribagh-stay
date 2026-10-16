@@ -1,13 +1,21 @@
 {
-  "name": "hazaribagh-stay",
+  "name": "addix-stay",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Addix Stay - Jharkhand's All-in-One Hostel, Room, Flat, Hotel & Shop Rental Portal",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "hazaribagh",
+    "jharkhand",
+    "hostel",
+    "room-rent",
+    "flat-rent",
+    "addix-stay"
+  ],
+  "author": "Deepak Prasad Verma",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
