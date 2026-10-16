@@ -84,12 +84,31 @@ const App = {
     }
   },
 
+  logoClickCount: 0,
+  logoClickTimer: null,
+
+  handleLogoClick(e) {
+    this.logoClickCount = (this.logoClickCount || 0) + 1;
+    clearTimeout(this.logoClickTimer);
+    this.logoClickTimer = setTimeout(() => {
+      this.logoClickCount = 0;
+    }, 1200);
+
+    // Secret entry: Triple-clicking the logo opens Admin Access
+    if (this.logoClickCount >= 3) {
+      this.logoClickCount = 0;
+      this.openAdminLoginModal();
+      return;
+    }
+    this.switchView('listings');
+  },
+
   updateRoleUI() {
     const roleBadge = document.getElementById('current-user-role-badge');
     const userNameEl = document.getElementById('current-user-name');
     const roleSelector = document.getElementById('role-selector-dropdown');
     const logoutBtn = document.getElementById('header-logout-btn');
-    const adminLoginBtn = document.getElementById('header-admin-login-btn');
+    const adminActiveBadge = document.getElementById('header-admin-active-badge');
 
     if (roleBadge) {
       const rolesMap = {
@@ -107,7 +126,26 @@ const App = {
       userNameEl.textContent = this.currentUser.name;
     }
 
+    // Dynamic dropdown management: Keep public options clean (only renter & owner)
+    // Only show admin or superadmin option when that role is currently authenticated
     if (roleSelector) {
+      const optAdmin = roleSelector.querySelector('option[value="admin"]');
+      const optSuper = roleSelector.querySelector('option[value="superadmin"]');
+      if (optAdmin && this.currentUser.role !== 'admin') optAdmin.remove();
+      if (optSuper && this.currentUser.role !== 'superadmin') optSuper.remove();
+
+      if (this.currentUser.role === 'admin' && !roleSelector.querySelector('option[value="admin"]')) {
+        const opt = document.createElement('option');
+        opt.value = 'admin';
+        opt.textContent = '🛡️ City Admin';
+        roleSelector.appendChild(opt);
+      }
+      if (this.currentUser.role === 'superadmin' && !roleSelector.querySelector('option[value="superadmin"]')) {
+        const opt = document.createElement('option');
+        opt.value = 'superadmin';
+        opt.textContent = '👑 Super Admin';
+        roleSelector.appendChild(opt);
+      }
       roleSelector.value = this.currentUser.role;
     }
 
@@ -122,24 +160,23 @@ const App = {
       el.style.display = (this.currentUser.role === 'superadmin') ? '' : 'none';
     });
 
-    // Update Header Admin Button & Logout Button
+    // Update Header Logout Button
     if (logoutBtn) {
-      logoutBtn.style.display = this.currentUser.role !== 'renter' ? 'flex' : 'none';
+      logoutBtn.style.display = this.currentUser.role !== 'renter' ? 'inline-flex' : 'none';
     }
 
-    if (adminLoginBtn) {
+    // Active Admin Pill in header (Only visible when logged in as Admin or SuperAdmin)
+    if (adminActiveBadge) {
       if (this.currentUser.role === 'superadmin') {
-        adminLoginBtn.innerHTML = '<i class="fa-solid fa-crown text-amber-300"></i> <span class="hidden sm:inline">Super Admin Active</span>';
-        adminLoginBtn.className = 'flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+        adminActiveBadge.className = 'flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-xl shadow bg-amber-500 hover:bg-amber-600 text-white cursor-pointer transition';
+        adminActiveBadge.innerHTML = '<i class="fa-solid fa-crown text-amber-200"></i> <span class="hidden sm:inline">Super Admin Active</span>';
+        adminActiveBadge.title = 'Open Super Admin Dashboard';
       } else if (this.currentUser.role === 'admin') {
-        adminLoginBtn.innerHTML = '<i class="fa-solid fa-shield-halved text-blue-300"></i> <span class="hidden sm:inline">City Admin Active</span>';
-        adminLoginBtn.className = 'flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
-      } else if (this.currentUser.role === 'owner') {
-        adminLoginBtn.innerHTML = '<i class="fa-solid fa-user-tie text-purple-300"></i> <span class="hidden sm:inline">Owner Active</span>';
-        adminLoginBtn.className = 'flex items-center gap-1.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+        adminActiveBadge.className = 'flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-xl shadow bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer transition';
+        adminActiveBadge.innerHTML = '<i class="fa-solid fa-shield-halved text-blue-200"></i> <span class="hidden sm:inline">City Admin Active</span>';
+        adminActiveBadge.title = 'Open City Admin Dashboard';
       } else {
-        adminLoginBtn.innerHTML = '<i class="fa-solid fa-key text-amber-400"></i> <span class="hidden sm:inline">Admin Access</span>';
-        adminLoginBtn.className = 'flex items-center gap-1.5 bg-gradient-to-r from-slate-900 to-indigo-900 hover:from-black hover:to-indigo-950 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer';
+        adminActiveBadge.className = 'hidden';
       }
     }
   },
@@ -227,24 +264,23 @@ const App = {
     this.switchRole('renter');
     window.location.hash = '';
     this.switchView('listings');
-    alert('Logged out. Returned to Student/Renter view.');
   },
 
   handleHashRoute() {
     const hash = window.location.hash.toLowerCase();
-    if (hash === '#admin') {
+    if (hash === '#admin' || hash === '#admin-portal' || hash === '#staff' || hash === '#cityadmin') {
       if (this.currentUser.role !== 'admin' && this.currentUser.role !== 'superadmin') {
         this.openAdminLoginModal();
       } else {
         this.switchView('admin-view');
       }
-    } else if (hash === '#superadmin') {
+    } else if (hash === '#superadmin' || hash === '#super-admin') {
       if (this.currentUser.role !== 'superadmin') {
         this.openAdminLoginModal();
       } else {
         this.switchView('superadmin-view');
       }
-    } else if (hash === '#owner') {
+    } else if (hash === '#owner' || hash === '#owner-portal') {
       if (this.currentUser.role !== 'owner' && this.currentUser.role !== 'admin' && this.currentUser.role !== 'superadmin') {
         this.openAdminLoginModal();
       } else {
@@ -303,6 +339,15 @@ const App = {
   },
 
   bindEvents() {
+    // Secret keyboard shortcut: Ctrl + Shift + A or Alt + A to open Admin Access
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) ||
+          (e.altKey && (e.key === 'A' || e.key === 'a'))) {
+        e.preventDefault();
+        this.openAdminLoginModal();
+      }
+    });
+
     // Nav buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {

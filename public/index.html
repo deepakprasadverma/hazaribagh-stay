@@ -59,7 +59,7 @@
       <div class="flex items-center justify-between h-16">
         
         <!-- Logo & City Tag -->
-        <div class="flex items-center gap-3 cursor-pointer" onclick="App.switchView('listings')">
+        <div id="brand-logo-trigger" class="flex items-center gap-3 cursor-pointer select-none" onclick="App.handleLogoClick(event)">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
             <i class="fa-solid fa-hotel text-lg"></i>
           </div>
@@ -95,27 +95,23 @@
           </button>
         </nav>
 
-        <!-- Admin Access, Role Indicator & Action Buttons -->
+        <!-- Action Buttons & Account Controls -->
         <div class="flex items-center gap-2 sm:gap-3">
-          <!-- Quick Admin Login Button -->
-          <button onclick="App.openAdminLoginModal()" id="header-admin-login-btn" class="flex items-center gap-1.5 bg-gradient-to-r from-slate-900 to-indigo-900 hover:from-black hover:to-indigo-950 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition">
-            <i class="fa-solid fa-key text-amber-400"></i>
-            <span class="hidden sm:inline">Admin Access</span>
-          </button>
+          <!-- Active Admin Status Pill (Only visible when logged in as Admin or SuperAdmin) -->
+          <div id="header-admin-active-badge" class="hidden items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-xl shadow cursor-pointer" onclick="App.switchView(App.currentUser.role === 'superadmin' ? 'superadmin-view' : 'admin-view')"></div>
 
-          <!-- Current Logged In Role Badge & Switcher -->
+          <!-- Public Role Switcher (Only Student and Owner visible publicly) -->
           <div class="bg-slate-100 hover:bg-slate-200 p-1 sm:p-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5 text-xs">
             <select id="role-selector-dropdown" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer">
               <option value="renter">👤 Student / Renter</option>
               <option value="owner">🏠 Property Owner</option>
-              <option value="admin">🛡️ City Admin</option>
-              <option value="superadmin">👑 Super Admin</option>
             </select>
           </div>
 
           <!-- Logout Button (Shown when logged in as Owner/Admin/SuperAdmin) -->
-          <button onclick="App.logout()" id="header-logout-btn" class="hidden text-xs bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2.5 py-2 rounded-xl transition" title="Logout">
+          <button onclick="App.logout()" id="header-logout-btn" class="hidden items-center gap-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2.5 py-1.5 rounded-xl transition" title="Logout">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span class="hidden sm:inline">Logout</span>
           </button>
 
           <button onclick="App.switchView('owner-add')" class="hidden md:flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md transition">
@@ -953,8 +949,15 @@
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 text-center border-t border-slate-800 pt-6 text-slate-500">
-      &copy; 2026 Addix Stay. Built for Students, Families & Property Owners in Hazaribagh.
+    <div class="max-w-7xl mx-auto px-4 border-t border-slate-800 pt-6 text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+      <div>
+        &copy; 2026 Addix Stay. Built for Students, Families & Property Owners across Jharkhand.
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#admin-portal" onclick="App.openAdminLoginModal(); return false;" class="text-slate-600 hover:text-slate-400 transition inline-flex items-center gap-1.5 text-[11px]" title="Authorized Staff Access Only">
+          <i class="fa-solid fa-lock text-[10px]"></i> Staff Portal
+        </a>
+      </div>
     </div>
   </footer>
 
