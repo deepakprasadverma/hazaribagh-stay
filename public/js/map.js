@@ -1,43 +1,53 @@
-// Leaflet Map Integration for Hazaribagh Stay Hub
-
 let mainMap = null;
 let pickerMap = null;
 let mainMarkersGroup = null;
+let landmarksGroup = null;
 let pickerMarker = null;
 
 const MapManager = {
-  // Initialize the primary interactive Hazaribagh exploration map
+  currentDistrict: 'Hazaribagh',
+
+  // Initialize the primary interactive exploration map
   initMainMap() {
     const mapElement = document.getElementById('hazaribagh-main-map');
     if (!mapElement || mainMap) return;
 
+    const districtData = (JHARKHAND_DATA && JHARKHAND_DATA.districts[this.currentDistrict]) || JHARKHAND_DATA.districts.Hazaribagh;
+
     mainMap = L.map('hazaribagh-main-map', {
-      center: HAZARIBAGH_DATA.center,
-      zoom: HAZARIBAGH_DATA.zoom,
+      center: districtData.center,
+      zoom: districtData.zoom || 13,
       scrollWheelZoom: true
     });
 
     // High quality OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors | Hazaribagh GPS Map',
+      attribution: '&copy; OpenStreetMap contributors | Addix Stay GPS Map',
       maxZoom: 19
     }).addTo(mainMap);
 
+    landmarksGroup = L.layerGroup().addTo(mainMap);
     mainMarkersGroup = L.layerGroup().addTo(mainMap);
 
-    // Add Key Hazaribagh Landmark Markers (University, Colleges, Lake, etc.)
-    this.addLandmarkBadges();
+    // Add Landmark Markers for initial district
+    this.renderLandmarksForDistrict(this.currentDistrict);
   },
 
-  addLandmarkBadges() {
-    const landmarks = [
-      { name: "Vinoba Bhave University (VBU)", lat: 24.0042, lng: 85.3812, type: "Univ" },
-      { name: "Annada College", lat: 23.9930, lng: 85.3615, type: "College" },
-      { name: "St. Columba's College", lat: 24.0020, lng: 85.3695, type: "College" },
-      { name: "Hazaribagh Lake (Jheel)", lat: 23.9890, lng: 85.3570, type: "Tourism" },
-      { name: "Canary Hill Viewpoint", lat: 24.0180, lng: 85.3750, type: "Tourism" },
-      { name: "Govt Bus Stand (District More)", lat: 23.9922, lng: 85.3665, type: "Transport" }
-    ];
+  setDistrict(districtName) {
+    this.currentDistrict = districtName;
+    const districtData = JHARKHAND_DATA && JHARKHAND_DATA.districts[districtName];
+    if (districtData && mainMap) {
+      mainMap.flyTo(districtData.center, districtData.zoom || 13, { animate: true, duration: 1.5 });
+      this.renderLandmarksForDistrict(districtName);
+    }
+  },
+
+  renderLandmarksForDistrict(districtName) {
+    if (!landmarksGroup || !mainMap) return;
+    landmarksGroup.clearLayers();
+
+    const districtData = JHARKHAND_DATA && JHARKHAND_DATA.districts[districtName];
+    const landmarks = (districtData && districtData.landmarks) || [];
 
     landmarks.forEach(lm => {
       const landmarkIcon = L.divIcon({
@@ -46,7 +56,7 @@ const MapManager = {
         iconSize: [120, 24],
         iconAnchor: [60, 12]
       });
-      L.marker([lm.lat, lm.lng], { icon: landmarkIcon }).addTo(mainMap);
+      L.marker([lm.lat, lm.lng], { icon: landmarkIcon }).addTo(landmarksGroup);
     });
   },
 
@@ -74,7 +84,8 @@ const MapManager = {
         iconAnchor: [19, 19]
       });
 
-      const whatsappText = encodeURIComponent(`Namaste! I am interested in your property "${prop.title}" in ${prop.locality}, Hazaribagh (Rent: ₹${prop.price}/${prop.pricePeriod}). Is it available?`);
+      const districtName = prop.district || 'Hazaribagh';
+      const whatsappText = encodeURIComponent(`Namaste! I am interested in your property "${prop.title}" in ${prop.locality}, ${districtName} (Rent: ₹${prop.price}/${prop.pricePeriod}). Is it available?`);
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${prop.lat},${prop.lng}`;
 
       const popupContent = `
@@ -86,7 +97,7 @@ const MapManager = {
             </span>
           </div>
           <h4 style="font-weight: 700; font-size: 14px; margin: 0 0 4px; color: #0f172a; line-height: 1.2;">${prop.title}</h4>
-          <p style="font-size: 12px; color: #64748b; margin: 0 0 6px;"><i class="fa-solid fa-location-dot text-red-500"></i> ${prop.locality}, Hazaribagh</p>
+          <p style="font-size: 12px; color: #64748b; margin: 0 0 6px;"><i class="fa-solid fa-location-dot text-red-500"></i> ${prop.locality}, <b>${districtName}</b></p>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span style="font-weight: 800; font-size: 16px; color: #2563eb;">₹${prop.price.toLocaleString('en-IN')}<span style="font-size: 11px; font-weight: 500; color: #64748b;">/${prop.pricePeriod}</span></span>
             <span style="font-size: 11px; color: #059669; font-weight: 600; background: #d1fae5; padding: 2px 6px; border-radius: 4px;">Available</span>
@@ -111,11 +122,21 @@ const MapManager = {
     });
   },
 
-  // Focus map on a specific locality
+  // Focus map on a specific locality across any district
   flyToLocality(localityName) {
-    const loc = HAZARIBAGH_DATA.localities.find(l => l.name.toLowerCase() === localityName.toLowerCase());
-    if (loc && mainMap) {
-      mainMap.flyTo([loc.lat, loc.lng], 15, { animate: true, duration: 1.2 });
+    let targetLoc = null;
+    const currentDist = JHARKHAND_DATA.districts[this.currentDistrict];
+    if (currentDist) {
+      targetLoc = currentDist.localities.find(l => l.name.toLowerCase() === localityName.toLowerCase());
+    }
+    if (!targetLoc) {
+      for (const distKey in JHARKHAND_DATA.districts) {
+        const found = JHARKHAND_DATA.districts[distKey].localities.find(l => l.name.toLowerCase() === localityName.toLowerCase());
+        if (found) { targetLoc = found; break; }
+      }
+    }
+    if (targetLoc && mainMap) {
+      mainMap.flyTo([targetLoc.lat, targetLoc.lng], 15, { animate: true, duration: 1.2 });
     }
   },
 

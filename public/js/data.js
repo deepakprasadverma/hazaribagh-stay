@@ -1,19 +1,170 @@
-// Hazaribagh Localities and Platform Constants
+// Jharkhand Multi-District Platform Constants & Data
+const JHARKHAND_DATA = {
+  activeDistrict: 'Hazaribagh',
+  districts: {
+    'Hazaribagh': {
+      name: 'Hazaribagh',
+      hindi: 'हजारीबाग',
+      status: 'Active Hub',
+      center: [23.9967, 85.3687],
+      zoom: 13,
+      localities: [
+        { name: "Matwari", desc: "Annada College & Coaching Hub", lat: 23.9935, lng: 85.3621 },
+        { name: "Korrah", desc: "Vinoba Bhave University (VBU) Area", lat: 24.0042, lng: 85.3812 },
+        { name: "Babugaon", desc: "Coaching Mandi & Bypass Road", lat: 23.9878, lng: 85.3745 },
+        { name: "Hurhuru", desc: "Peaceful Family Residential Area", lat: 23.9989, lng: 85.3524 },
+        { name: "Nawabganj", desc: "Central Market & Sadar Hospital", lat: 23.9941, lng: 85.3592 },
+        { name: "Canary Hill Road", desc: "Tourism & Scenic Guest Houses", lat: 24.0152, lng: 85.3725 },
+        { name: "Dipugarha", desc: "St. Columba's College Area", lat: 24.0015, lng: 85.3698 },
+        { name: "Jhanda Chowk", desc: "Prime Commercial Main Road", lat: 23.9958, lng: 85.3648 },
+        { name: "District More", desc: "New Bus Stand & Transit Lodges", lat: 23.9922, lng: 85.3665 },
+        { name: "Okni / Lake Road", desc: "Hazaribagh Jheel & Parks", lat: 23.9890, lng: 85.3570 }
+      ],
+      landmarks: [
+        { name: "Vinoba Bhave University (VBU)", lat: 24.0042, lng: 85.3812, type: "Univ" },
+        { name: "Annada College", lat: 23.9930, lng: 85.3615, type: "College" },
+        { name: "St. Columba's College", lat: 24.0020, lng: 85.3695, type: "College" },
+        { name: "Hazaribagh Lake (Jheel)", lat: 23.9890, lng: 85.3570, type: "Tourism" },
+        { name: "Canary Hill Viewpoint", lat: 24.0180, lng: 85.3750, type: "Tourism" },
+        { name: "Govt Bus Stand (District More)", lat: 23.9922, lng: 85.3665, type: "Transport" }
+      ]
+    },
+    'Ranchi': {
+      name: 'Ranchi',
+      hindi: 'राँची (राजधानी)',
+      status: 'Live',
+      center: [23.3700, 85.3250],
+      zoom: 13,
+      localities: [
+        { name: "Lalpur", desc: "Coaching & Girls PG Hub (Nucleus Mall)", lat: 23.3725, lng: 85.3340 },
+        { name: "Morabadi", desc: "Morabadi Ground & Peaceful Flats", lat: 23.3920, lng: 85.3260 },
+        { name: "Kanke Road", desc: "BAU University & Premium Residential", lat: 23.4050, lng: 85.3180 },
+        { name: "Doranda", desc: "High Court & Central Secretariat", lat: 23.3360, lng: 85.3250 },
+        { name: "Ratu Road", desc: "Commercial & Business Hub", lat: 23.3780, lng: 85.3050 },
+        { name: "Bariatu", desc: "RIMS Medical College Hospital Area", lat: 23.3960, lng: 85.3580 }
+      ],
+      landmarks: [
+        { name: "Ranchi University", lat: 23.3860, lng: 85.3240, type: "Univ" },
+        { name: "Morabadi Ground", lat: 23.3910, lng: 85.3270, type: "Tourism" },
+        { name: "Ranchi Railway Station", lat: 23.3510, lng: 85.3380, type: "Transport" }
+      ]
+    },
+    'Dhanbad': {
+      name: 'Dhanbad',
+      hindi: 'धनबाद',
+      status: 'Live',
+      center: [23.7957, 86.4304],
+      zoom: 13,
+      localities: [
+        { name: "Bank More", desc: "Prime Commercial & Retail Market", lat: 23.7885, lng: 86.4250 },
+        { name: "Saraidhela", desc: "Malls, Hospitals & Residential Flats", lat: 23.8180, lng: 86.4480 },
+        { name: "Hirapur", desc: "Student Lodges & Coaching Hub", lat: 23.8050, lng: 86.4350 },
+        { name: "City Centre", desc: "Commercial Complex & Offices", lat: 23.8120, lng: 86.4420 }
+      ],
+      landmarks: [
+        { name: "IIT (ISM) Dhanbad", lat: 23.8160, lng: 86.4410, type: "Univ" },
+        { name: "Dhanbad Junction", lat: 23.7920, lng: 86.4290, type: "Transport" }
+      ]
+    },
+    'Bokaro': {
+      name: 'Bokaro',
+      hindi: 'बोकारो स्टील सिटी',
+      status: 'Live',
+      center: [23.6693, 86.1511],
+      zoom: 13,
+      localities: [
+        { name: "Sector 4", desc: "Student Coaching & City Centre Hub", lat: 23.6695, lng: 86.1515 },
+        { name: "Chas", desc: "Affordable Family Flats & Markets", lat: 23.6350, lng: 86.1750 },
+        { name: "Sector 1", desc: "Residential Colony with Parks", lat: 23.6780, lng: 86.1350 },
+        { name: "Cooperative Colony", desc: "Quiet Residential Society", lat: 23.6520, lng: 86.1680 }
+      ],
+      landmarks: [
+        { name: "City Centre Sector 4", lat: 23.6680, lng: 86.1520, type: "Commercial" },
+        { name: "Bokaro Steel Plant", lat: 23.6750, lng: 86.1850, type: "Industrial" }
+      ]
+    },
+    'Ramgarh': {
+      name: 'Ramgarh',
+      hindi: 'रामगढ़',
+      status: 'Live',
+      center: [23.6332, 85.5147],
+      zoom: 13,
+      localities: [
+        { name: "Subhash Chowk", desc: "Main Road Market & Bus Stand", lat: 23.6335, lng: 85.5150 },
+        { name: "Ramgarh Cantt", desc: "Cantt Area & Army Ground", lat: 23.6280, lng: 85.5250 },
+        { name: "Chitarpur", desc: "RU University Link & Colleges", lat: 23.5850, lng: 85.6450 }
+      ],
+      landmarks: [
+        { name: "Rajrappa Mandir Link", lat: 23.6320, lng: 85.5200, type: "Tourism" },
+        { name: "Ramgarh Cantt Railway Station", lat: 23.6390, lng: 85.5080, type: "Transport" }
+      ]
+    },
+    'Giridih': {
+      name: 'Giridih',
+      hindi: 'गिरिडीह',
+      status: 'Launch Phase',
+      center: [24.1856, 86.3097],
+      zoom: 13,
+      localities: [
+        { name: "Makatpur", desc: "Commercial & Shopping Market", lat: 24.1870, lng: 86.3120 },
+        { name: "Bada Chowk", desc: "Main Town Area & Lodges", lat: 24.1820, lng: 86.3050 },
+        { name: "Pachamba", desc: "Quiet Residential Colony", lat: 24.2150, lng: 86.2750 }
+      ],
+      landmarks: [
+        { name: "Usri Falls Road", lat: 24.1950, lng: 86.3250, type: "Tourism" }
+      ]
+    },
+    'Deoghar': {
+      name: 'Deoghar',
+      hindi: 'देवघर (बाबाधाम)',
+      status: 'Live',
+      center: [24.4826, 86.7003],
+      zoom: 13,
+      localities: [
+        { name: "Tower Chowk", desc: "Central Market & Pilgrim Hotels", lat: 24.4850, lng: 86.6980 },
+        { name: "Jasidih", desc: "Main Railway Junction & Transits", lat: 24.5150, lng: 86.6450 },
+        { name: "Castairs Town", desc: "Peaceful Residential Colony", lat: 24.4780, lng: 86.7080 }
+      ],
+      landmarks: [
+        { name: "Baba Baidyanath Jyotirlinga", lat: 24.4920, lng: 86.7000, type: "Tourism" }
+      ]
+    },
+    'Koderma': {
+      name: 'Koderma',
+      hindi: 'कोडरमा / झुमरी तिलैया',
+      status: 'Launch Phase',
+      center: [24.4340, 85.5350],
+      zoom: 13,
+      localities: [
+        { name: "Jhumri Telaiya", desc: "Famous Commercial Town & Lodges", lat: 24.4350, lng: 85.5320 },
+        { name: "Station Road", desc: "Koderma Junction Transit Area", lat: 24.4420, lng: 85.5280 }
+      ],
+      landmarks: [
+        { name: "Koderma Railway Junction", lat: 24.4430, lng: 85.5290, type: "Transport" }
+      ]
+    },
+    'Chatra': {
+      name: 'Chatra',
+      hindi: 'चतरा',
+      status: 'Launch Phase',
+      center: [24.2094, 84.8715],
+      zoom: 13,
+      localities: [
+        { name: "Main Market", desc: "Main Town Market & Lodges", lat: 24.2110, lng: 84.8730 },
+        { name: "Sadar Hospital Road", desc: "Residential Area", lat: 24.2050, lng: 84.8690 }
+      ],
+      landmarks: [
+        { name: "Chatra Collectorate", lat: 24.2080, lng: 84.8750, type: "Govt" }
+      ]
+    }
+  }
+};
+
+// Backward-compatible alias for existing references
 const HAZARIBAGH_DATA = {
-  center: [23.9967, 85.3687],
-  zoom: 13,
-  localities: [
-    { name: "Matwari", desc: "Annada College & Coaching Hub", lat: 23.9935, lng: 85.3621 },
-    { name: "Korrah", desc: "Vinoba Bhave University (VBU) Area", lat: 24.0042, lng: 85.3812 },
-    { name: "Babugaon", desc: "Coaching Mandi & Bypass Road", lat: 23.9878, lng: 85.3745 },
-    { name: "Hurhuru", desc: "Peaceful Family Residential Area", lat: 23.9989, lng: 85.3524 },
-    { name: "Nawabganj", desc: "Central Market & Sadar Hospital", lat: 23.9941, lng: 85.3592 },
-    { name: "Canary Hill Road", desc: "Tourism & Scenic Guest Houses", lat: 24.0152, lng: 85.3725 },
-    { name: "Dipugarha", desc: "St. Columba's College Area", lat: 24.0015, lng: 85.3698 },
-    { name: "Jhanda Chowk", desc: "Prime Commercial Main Road", lat: 23.9958, lng: 85.3648 },
-    { name: "District More", desc: "New Bus Stand & Transit Lodges", lat: 23.9922, lng: 85.3665 },
-    { name: "Okni / Lake Road", desc: "Hazaribagh Jheel & Parks", lat: 23.9890, lng: 85.3570 }
-  ],
+  center: JHARKHAND_DATA.districts.Hazaribagh.center,
+  zoom: JHARKHAND_DATA.districts.Hazaribagh.zoom,
+  localities: JHARKHAND_DATA.districts.Hazaribagh.localities,
   categories: {
     student_hostel: {
       label: "Student Hostel (छात्र हॉस्टल)",

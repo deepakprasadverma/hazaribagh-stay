@@ -31,7 +31,8 @@
     "status": "approved",
     "isFeatured": false,
     "availableRooms": 1,
-    "createdAt": "2026-10-13T20:22:16.584Z"
+    "createdAt": "2026-10-13T20:22:16.584Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-101",
@@ -71,7 +72,8 @@
     "status": "approved",
     "isFeatured": true,
     "availableRooms": 4,
-    "createdAt": "2026-09-15T10:00:00Z"
+    "createdAt": "2026-09-15T10:00:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-102",
@@ -111,7 +113,8 @@
     "status": "approved",
     "isFeatured": true,
     "availableRooms": 3,
-    "createdAt": "2026-09-18T11:20:00Z"
+    "createdAt": "2026-09-18T11:20:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-103",
@@ -149,7 +152,8 @@
     "status": "approved",
     "isFeatured": false,
     "availableRooms": 5,
-    "createdAt": "2026-09-22T09:15:00Z"
+    "createdAt": "2026-09-22T09:15:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-104",
@@ -188,7 +192,8 @@
     "status": "approved",
     "isFeatured": true,
     "availableRooms": 1,
-    "createdAt": "2026-09-25T14:40:00Z"
+    "createdAt": "2026-09-25T14:40:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-105",
@@ -226,7 +231,8 @@
     "status": "approved",
     "isFeatured": false,
     "availableRooms": 1,
-    "createdAt": "2026-09-28T16:10:00Z"
+    "createdAt": "2026-09-28T16:10:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-106",
@@ -265,7 +271,8 @@
     "status": "approved",
     "isFeatured": true,
     "availableRooms": 12,
-    "createdAt": "2026-10-01T12:00:00Z"
+    "createdAt": "2026-10-01T12:00:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-107",
@@ -303,7 +310,8 @@
     "status": "approved",
     "isFeatured": false,
     "availableRooms": 8,
-    "createdAt": "2026-10-02T15:30:00Z"
+    "createdAt": "2026-10-02T15:30:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-108",
@@ -342,7 +350,8 @@
     "status": "approved",
     "isFeatured": true,
     "availableRooms": 1,
-    "createdAt": "2026-10-04T10:15:00Z"
+    "createdAt": "2026-10-04T10:15:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-109",
@@ -380,7 +389,8 @@
     "status": "approved",
     "isFeatured": false,
     "availableRooms": 1,
-    "createdAt": "2026-10-05T13:45:00Z"
+    "createdAt": "2026-10-05T13:45:00Z",
+    "district": "Hazaribagh"
   },
   {
     "id": "prop-110",
@@ -418,6 +428,197 @@
     "status": "approved",
     "isFeatured": false,
     "availableRooms": 2,
-    "createdAt": "2026-10-07T08:30:00Z"
+    "createdAt": "2026-10-07T08:30:00Z",
+    "district": "Hazaribagh"
+  },
+  {
+    "id": "prop-ranchi-101",
+    "title": "Oxford Executive Girls Hostel & PG (Near Ranchi Women's College)",
+    "district": "Ranchi",
+    "category": "student_hostel",
+    "targetAudience": "Girls Student",
+    "price": 4800,
+    "pricePeriod": "month",
+    "deposit": 4000,
+    "locality": "Lalpur",
+    "address": "Circular Road, Lalpur, Ranchi, Jharkhand - 834001",
+    "landmark": "Near Ranchi Women's College & Nucleus Mall",
+    "lat": 23.3725,
+    "lng": 85.334,
+    "sharing": "2 Sharing with Study Desk",
+    "foodIncluded": true,
+    "amenities": [
+      "High-Speed Wi-Fi",
+      "RO Drinking Water",
+      "4-Time Hygienic Mess",
+      "24x7 Power Backup",
+      "CCTV Security",
+      "Biometric Entry",
+      "Attached Bathroom"
+    ],
+    "ownerId": "owner-ranchi-1",
+    "ownerName": "Pooja Sharma",
+    "ownerPhone": "+917631740228",
+    "ownerWhatsapp": "917631740228",
+    "ownerEmail": "oxford.pg.ranchi@gmail.com",
+    "images": [
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Lalpur Ranchi ka sabse safe aur top girls hostel. Ranchi Women's College aur coaching institutes se sirf 3 minute walking distance.",
+    "status": "approved",
+    "isFeatured": true,
+    "availableRooms": 3,
+    "createdAt": "2026-11-03T12:53:48.162Z"
+  },
+  {
+    "id": "prop-ranchi-102",
+    "title": "Sunshine Residency 2BHK Family Flat (Morabadi Ground)",
+    "district": "Ranchi",
+    "category": "family_flat",
+    "targetAudience": "Family",
+    "price": 13500,
+    "pricePeriod": "month",
+    "deposit": 25000,
+    "locality": "Morabadi",
+    "address": "Near Oxygen Park, Morabadi, Ranchi",
+    "landmark": "Facing Morabadi Ground & Tribal Research Institute",
+    "lat": 23.392,
+    "lng": 85.326,
+    "sharing": "2BHK 950 Sq.Ft",
+    "foodIncluded": false,
+    "amenities": [
+      "Car & Bike Parking",
+      "Lift Facility",
+      "24x7 Power Backup",
+      "Security Guard",
+      "Modular Kitchen",
+      "Balcony with Garden View"
+    ],
+    "ownerId": "owner-ranchi-2",
+    "ownerName": "Alok Nath Singh",
+    "ownerPhone": "+917631740228",
+    "ownerWhatsapp": "917631740228",
+    "ownerEmail": "alok.morabadi@gmail.com",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Morabadi Ground ke paas shaant aur green vatavaran me brand new 2BHK flat. Family ke liye 24 ghante pani, bijli aur lift.",
+    "status": "approved",
+    "isFeatured": true,
+    "availableRooms": 1,
+    "createdAt": "2026-11-03T12:53:48.162Z"
+  },
+  {
+    "id": "prop-bokaro-101",
+    "title": "Steel City Aspirants Boys Lodge (Sector 4 Coaching Hub)",
+    "district": "Bokaro",
+    "category": "student_lodge",
+    "targetAudience": "Boys Student",
+    "price": 2400,
+    "pricePeriod": "month",
+    "deposit": 2000,
+    "locality": "Sector 4",
+    "address": "Plot 42, Sector 4/F, City Center Road, Bokaro Steel City",
+    "landmark": "Behind DPS Bokaro & Coaching Complex",
+    "lat": 23.6695,
+    "lng": 86.1515,
+    "sharing": "Single & Double Rooms",
+    "foodIncluded": false,
+    "amenities": [
+      "High-Speed Wi-Fi",
+      "RO Drinking Water",
+      "Study Table & Chair",
+      "Power Inverter Backup",
+      "Separate Key Access"
+    ],
+    "ownerId": "owner-bokaro-1",
+    "ownerName": "Manoj Kumar Tiwari",
+    "ownerPhone": "+917631740228",
+    "ownerWhatsapp": "917631740228",
+    "ownerEmail": "manoj.bokaro@gmail.com",
+    "images": [
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Bokaro Sector 4 coaching hub me padhai karne wale JEE/NEET aspirants ke liye silent aur budget lodge rooms.",
+    "status": "approved",
+    "isFeatured": false,
+    "availableRooms": 4,
+    "createdAt": "2026-11-03T12:53:48.162Z"
+  },
+  {
+    "id": "prop-dhanbad-101",
+    "title": "Prime Commercial Retail Shop & Showroom (Bank More)",
+    "district": "Dhanbad",
+    "category": "commercial_shop",
+    "targetAudience": "Business / Retail",
+    "price": 18000,
+    "pricePeriod": "month",
+    "deposit": 40000,
+    "locality": "Bank More",
+    "address": "Main Road, Opposite Urmila Tower, Bank More, Dhanbad",
+    "landmark": "Opposite Urmila Tower & Railway Station Link Road",
+    "lat": 23.7885,
+    "lng": 86.425,
+    "sharing": "450 Sq.Ft Ground Floor",
+    "foodIncluded": false,
+    "amenities": [
+      "Commercial Rolling Shutter",
+      "Main Road Road-Facing Glass Front",
+      "24x7 Power Backup",
+      "High Footfall Location",
+      "Dedicated Customer Parking"
+    ],
+    "ownerId": "owner-dhanbad-1",
+    "ownerName": "Vikram Agarwal",
+    "ownerPhone": "+917631740228",
+    "ownerWhatsapp": "917631740228",
+    "ownerEmail": "vikram.dhanbad@gmail.com",
+    "images": [
+      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Dhanbad Bank More ke sabse prime main road commercial spot par ground floor shop. Clinic, retail, electronics ya branded outlet ke liye best.",
+    "status": "approved",
+    "isFeatured": true,
+    "availableRooms": 1,
+    "createdAt": "2026-11-03T12:53:48.162Z"
+  },
+  {
+    "id": "prop-ramgarh-101",
+    "title": "Highway Comfort Tourist Hotel & Guest Stay (NH-33 Cantt)",
+    "district": "Ramgarh",
+    "category": "hotel_stay",
+    "targetAudience": "Tourists / Visitors",
+    "price": 1200,
+    "pricePeriod": "day",
+    "deposit": 0,
+    "locality": "Subhash Chowk",
+    "address": "NH-33 Ranchi-Patna Highway, Ramgarh Cantt, Jharkhand",
+    "landmark": "Near Subhash Chowk & Ramgarh Railway Station",
+    "lat": 23.6335,
+    "lng": 85.515,
+    "sharing": "Deluxe AC & Non-AC Rooms",
+    "foodIncluded": false,
+    "amenities": [
+      "Air Conditioner (AC)",
+      "Attached Bathroom",
+      "Restaurant & Room Service",
+      "Free High-Speed Wi-Fi",
+      "Spacious Car Parking"
+    ],
+    "ownerId": "owner-ramgarh-1",
+    "ownerName": "Harpreet Singh",
+    "ownerPhone": "+917631740228",
+    "ownerWhatsapp": "917631740228",
+    "ownerEmail": "highway.ramgarh@gmail.com",
+    "images": [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "NH-33 par travel karne wale travellers, families aur business executives ke liye safe aur clean hotel rooms.",
+    "status": "approved",
+    "isFeatured": false,
+    "availableRooms": 5,
+    "createdAt": "2026-11-03T12:53:48.162Z"
   }
 ]

@@ -44,7 +44,11 @@ const writeJson = (filePath, data) => {
 // GET all properties with filtering
 app.get('/api/properties', (req, res) => {
   let properties = readJson(PROPS_FILE, []);
-  const { category, locality, minPrice, maxPrice, search, ownerId, status } = req.query;
+  const { category, locality, district, minPrice, maxPrice, search, ownerId, status } = req.query;
+
+  if (district && district !== 'all') {
+    properties = properties.filter(p => (p.district || 'Hazaribagh').toLowerCase() === district.toLowerCase());
+  }
 
   if (category && category !== 'all') {
     properties = properties.filter(p => p.category === category);
@@ -74,6 +78,7 @@ app.get('/api/properties', (req, res) => {
     const q = search.toLowerCase();
     properties = properties.filter(p => 
       p.title.toLowerCase().includes(q) ||
+      (p.district && p.district.toLowerCase().includes(q)) ||
       p.locality.toLowerCase().includes(q) ||
       p.address.toLowerCase().includes(q) ||
       p.landmark.toLowerCase().includes(q) ||
@@ -100,6 +105,7 @@ app.post('/api/properties', (req, res) => {
   const newProp = {
     id: 'prop-' + Date.now(),
     title: req.body.title || 'Untitled Property',
+    district: req.body.district || 'Hazaribagh',
     category: req.body.category || 'student_hostel',
     targetAudience: req.body.targetAudience || 'Any',
     price: Number(req.body.price) || 2000,
@@ -347,13 +353,16 @@ app.post('/api/chatbot', (req, res) => {
   let reply = '';
   let matchedProperties = [];
 
-  // Match localities
-  const localities = ['matwari', 'korrah', 'babugaon', 'hurhuru', 'nawabganj', 'canary', 'dipugarha', 'jhanda chowk', 'district more'];
+  // Match districts & localities
+  const districts = ['hazaribagh', 'ranchi', 'dhanbad', 'bokaro', 'jamshedpur', 'ramgarh', 'giridih', 'deoghar', 'koderma', 'chatra'];
+  const matchedDistrict = districts.find(d => q.includes(d));
+
+  const localities = ['matwari', 'korrah', 'babugaon', 'hurhuru', 'nawabganj', 'canary', 'dipugarha', 'jhanda chowk', 'district more', 'lalpur', 'morabadi', 'bank more', 'sector 4'];
   const matchedLocality = localities.find(loc => q.includes(loc));
 
   // Match categories
   let categoryFilter = null;
-  if (q.includes('hostel') || q.includes('boys') || q.includes('girls')) categoryFilter = 'student_hostel';
+  if (q.includes('hostel') || q.includes('boys') || q.includes('girls') || q.includes('pg')) categoryFilter = 'student_hostel';
   else if (q.includes('lodge') || q.includes('room') || q.includes('to-let') || q.includes('single')) categoryFilter = 'student_lodge';
   else if (q.includes('flat') || q.includes('family') || q.includes('bhk') || q.includes('apartment')) categoryFilter = 'family_flat';
   else if (q.includes('hotel') || q.includes('guest house') || q.includes('visit') || q.includes('day')) categoryFilter = 'hotel_stay';
@@ -363,23 +372,26 @@ app.post('/api/chatbot', (req, res) => {
   matchedProperties = properties.filter(p => {
     let match = true;
     if (categoryFilter && p.category !== categoryFilter) match = false;
+    if (matchedDistrict && (p.district || 'Hazaribagh').toLowerCase() !== matchedDistrict) match = false;
     if (matchedLocality && !p.locality.toLowerCase().includes(matchedLocality) && !p.address.toLowerCase().includes(matchedLocality)) match = false;
     return match;
   });
 
   // Construct intelligent response in natural Hinglish
+  const currentCity = matchedDistrict ? (matchedDistrict.charAt(0).toUpperCase() + matchedDistrict.slice(1)) : 'Hazaribagh & Jharkhand';
+
   if (q.includes('hello') || q.includes('hi') || q.includes('namaste') || q.includes('pranam')) {
-    reply = `Namaste! 🙏 Main aapka Addix Stay Assistant hoon. Main aapko VBU, Annada College, Matwari, Korrah ya poore Hazaribagh me best Student Hostel, Lodge, Family Flat, Hotel aur Shop dhundhne me madad kar sakta hoon! Aapko kis type ki property chahiye?`;
+    reply = `Namaste! 🙏 Main Addix Stay ka AI Assistant hoon. Main aapko Hazaribagh, Ranchi, Dhanbad, Bokaro ya poore Jharkhand me verified Student Hostel, Lodge, Family Flat, Hotel aur Shop khojne me madad kar sakta hoon! Aapko kis area ya district me property chahiye?`;
   } else if (matchedProperties.length > 0) {
     const top = matchedProperties.slice(0, 3);
-    const names = top.map(p => `• <b>${p.title}</b> (${p.locality}) - ₹${p.price}/${p.pricePeriod}`).join('<br>');
-    reply = `Mujhe aapke liye Hazaribagh me <b>${matchedProperties.length}</b> behtareen options mile:<br><br>${names}<br><br>👉 Aap map par inka exact GPS location dekh sakte hain ya direct WhatsApp par owner se baat kar sakte hain!`;
+    const names = top.map(p => `• <b>${p.title}</b> (${p.locality}, ${p.district || 'Hazaribagh'}) - ₹${p.price}/${p.pricePeriod}`).join('<br>');
+    reply = `Mujhe aapke liye <b>${matchedProperties.length}</b> behtareen verified options mile:<br><br>${names}<br><br>👉 Aap card par WhatsApp ya Call karke direct owner se connect kar sakte hain!`;
   } else if (q.includes('price') || q.includes('budget') || q.includes('rent') || q.includes('kam kharch')) {
-    reply = `Hazaribagh me student lodges ₹1,500 - ₹2,500/month se start hoti hain. Hostels with 4-time food ₹3,200 - ₹4,000/month me available hain. Family flats ₹7,000 - ₹15,000/month me milte hain. Aap hamare filter se apna budget set kar sakte hain!`;
+    reply = `Jharkhand me student single lodges ₹1,500 - ₹2,500/month se start hoti hain. Hostels with hygienic food ₹3,200 - ₹4,800/month me uplabdh hain. Family flats ₹7,000 - ₹15,000/month me milte hain. Aap hamare "Budget Filter" se apna man-chaha rent select kar sakte hain!`;
   } else if (q.includes('contact') || q.includes('phone') || q.includes('whatsapp') || q.includes('help')) {
-    reply = `Aap kisi bhi property ke card par <b>WhatsApp Chat</b> ya <b>Call Owner</b> button daba kar seedhe owner se baat kar sakte hain. Platform helpline WhatsApp number: <b>+91-7631740228</b> hai!`;
+    reply = `Aap kisi bhi property ke card par <b>WhatsApp Chat</b> ya <b>Call Owner</b> button daba kar seedhe owner se baat kar sakte hain. Official Addix Stay Helpline WhatsApp: <b>+91-7631740228</b> hai!`;
   } else {
-    reply = `Aap Hazaribagh ke kisi bhi area jaise Matwari, Korrah, Babugaon, Hurhuru ya Main Road me Hostel, Flat, Lodge, Hotel ya Shop khoj sakte hain. Neeche diye gaye quick buttons par click karein ya apna requirement batayein!`;
+    reply = `Aap Hazaribagh (Matwari, Korrah, Babugaon), Ranchi (Lalpur, Morabadi), Bokaro ya Dhanbad me Hostel, Flat, Lodge, Hotel ya Shop khoj sakte hain. Neeche diye gaye quick buttons par click karein ya apna requirement batayein!`;
   }
 
   res.json({

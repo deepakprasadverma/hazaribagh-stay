@@ -152,3 +152,51 @@ body {
   color: #1e293b;
   border-top-left-radius: 4px;
 }
+
+/* Shortlist / Bookmark Heart Button */
+.btn-shortlist {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-shortlist:hover {
+  transform: scale(1.15);
+}
+.btn-shortlist.active {
+  background-color: #fee2e2 !important;
+  color: #ef4444 !important;
+}
+.btn-shortlist.active i {
+  color: #ef4444 !important;
+  font-weight: 900 !important;
+  animation: heart-beat 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes heart-beat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* Mobile Sticky Bottom Navigation */
+.mobile-bottom-bar {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Price Range Filter Active Pill */
+.budget-filter-btn.active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* Verified Owner Tick */
+.owner-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #0284c7;
+  font-weight: 700;
+}
+

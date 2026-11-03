@@ -1,5 +1,4 @@
-// Main Application Controller for Apna Hazaribagh Stay Hub
-
+// Main Application Controller for Addix Stay Portal
 const App = {
   currentView: 'listings',
   currentUser: null,
@@ -7,14 +6,22 @@ const App = {
   properties: [],
   settings: {},
   activeCategoryFilter: 'all',
+  activeDistrictFilter: 'Hazaribagh',
   activeLocalityFilter: 'all',
+  activeBudgetFilter: 'all',
   searchQuery: '',
   maxPriceFilter: '',
+  shortlist: JSON.parse(localStorage.getItem('addix_shortlist') || '[]'),
+  showingShortlistOnly: false,
+  activeQueryProperty: null,
 
   async init() {
     await this.loadUsers();
     await this.loadSettings();
     this.setupCurrentUser('user-renter-1'); // Default to Student/Renter
+    this.populateLocalitiesDropdown(this.activeDistrictFilter);
+    this.populateOwnerFormLocalities('Hazaribagh');
+    this.updateShortlistUI();
     this.bindEvents();
     
     // Check initial hash route
@@ -435,8 +442,220 @@ const App = {
     }
   },
 
+  // District Switcher & Dynamic Localities
+  handleDistrictChange(district) {
+    this.activeDistrictFilter = district;
+    this.activeLocalityFilter = 'all';
+    this.populateLocalitiesDropdown(district);
+    if (district !== 'all' && typeof MapManager !== 'undefined') {
+      MapManager.setDistrict(district);
+    }
+    this.filterAndRenderProperties();
+  },
+
+  populateLocalitiesDropdown(district) {
+    const locSelect = document.getElementById('locality-filter-select');
+    if (!locSelect) return;
+
+    let localities = [];
+    if (district === 'all') {
+      for (const dKey in JHARKHAND_DATA.districts) {
+        localities.push(...JHARKHAND_DATA.districts[dKey].localities);
+      }
+    } else {
+      const distData = JHARKHAND_DATA.districts[district] || JHARKHAND_DATA.districts.Hazaribagh;
+      localities = distData.localities;
+    }
+
+    locSelect.innerHTML = `<option value="all">All Localities (${district === 'all' ? 'All Jharkhand' : district})</option>` +
+      localities.map(l => `<option value="${l.name}">${l.name} - ${l.desc}</option>`).join('');
+  },
+
+  handleOwnerFormDistrictChange(district) {
+    this.populateOwnerFormLocalities(district);
+    const distData = JHARKHAND_DATA.districts[district] || JHARKHAND_DATA.districts.Hazaribagh;
+    if (distData && typeof MapManager !== 'undefined') {
+      MapManager.initPickerMap(distData.center[0], distData.center[1]);
+    }
+  },
+
+  populateOwnerFormLocalities(district) {
+    const locSelect = document.getElementById('prop-form-locality');
+    if (!locSelect) return;
+    const distData = JHARKHAND_DATA.districts[district] || JHARKHAND_DATA.districts.Hazaribagh;
+    locSelect.innerHTML = distData.localities.map(l => `<option value="${l.name}">${l.name} (${l.desc})</option>`).join('');
+  },
+
+  setBudgetFilter(budgetKey, btnEl) {
+    this.activeBudgetFilter = budgetKey;
+    document.querySelectorAll('.budget-filter-btn').forEach(b => {
+      b.classList.remove('active', 'bg-white/20', 'font-bold');
+      b.classList.add('bg-white/10', 'font-semibold');
+    });
+    if (btnEl) {
+      btnEl.classList.add('active', 'bg-white/20', 'font-bold');
+      btnEl.classList.remove('bg-white/10');
+    }
+    this.filterAndRenderProperties();
+  },
+
+  // Shortlist / Bookmark System
+  toggleShortlist(propId, e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const idx = this.shortlist.indexOf(propId);
+    if (idx > -1) {
+      this.shortlist.splice(idx, 1);
+    } else {
+      this.shortlist.push(propId);
+    }
+    localStorage.setItem('addix_shortlist', JSON.stringify(this.shortlist));
+    this.updateShortlistUI();
+
+    if (this.showingShortlistOnly) {
+      this.filterAndRenderProperties();
+    } else {
+      document.querySelectorAll(`[data-shortlist-id="${propId}"]`).forEach(btn => {
+        const isSaved = this.shortlist.includes(propId);
+        btn.classList.toggle('active', isSaved);
+        btn.innerHTML = `<i class="${isSaved ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart"></i>`;
+      });
+    }
+  },
+
+  updateShortlistUI() {
+    const count = this.shortlist.length;
+    const headerCount = document.getElementById('header-shortlist-count');
+    const mobileCount = document.getElementById('mobile-shortlist-count');
+    if (headerCount) headerCount.textContent = count;
+    if (mobileCount) mobileCount.textContent = count;
+  },
+
+  showShortlistOnly() {
+    this.showingShortlistOnly = !this.showingShortlistOnly;
+    const navBtn = document.getElementById('nav-shortlist-btn');
+    if (navBtn) {
+      if (this.showingShortlistOnly) {
+        navBtn.classList.add('bg-red-50', 'text-red-600', 'font-bold');
+      } else {
+        navBtn.classList.remove('bg-red-50', 'text-red-600', 'font-bold');
+      }
+    }
+    this.switchView('listings');
+    this.filterAndRenderProperties();
+  },
+
+  // Rent & Roommate Split Calculator
+  openCalculatorModal() {
+    const modal = document.getElementById('calculator-modal');
+    if (modal) modal.classList.remove('hidden');
+    this.calculateRentSplit();
+  },
+  closeCalculatorModal() {
+    const modal = document.getElementById('calculator-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+  calculateRentSplit() {
+    const rent = Number(document.getElementById('calc-rent')?.value) || 0;
+    const roommates = Number(document.getElementById('calc-roommates')?.value) || 1;
+    const electricity = Number(document.getElementById('calc-electricity')?.value) || 0;
+    const mess = Number(document.getElementById('calc-mess')?.value) || 0;
+    const wifi = Number(document.getElementById('calc-wifi')?.value) || 0;
+
+    const totalSharedRoom = rent + electricity + wifi;
+    const perPersonRoom = totalSharedRoom / roommates;
+    const perPersonTotal = Math.round(perPersonRoom + mess);
+    const totalAll = totalSharedRoom + (mess * roommates);
+
+    const totalEl = document.getElementById('calc-total-expense');
+    const perPersonEl = document.getElementById('calc-per-person');
+    if (totalEl) totalEl.textContent = `₹${totalAll.toLocaleString('en-IN')}`;
+    if (perPersonEl) perPersonEl.innerHTML = `₹${perPersonTotal.toLocaleString('en-IN')}<span class="text-xs text-slate-500 font-normal">/mo</span>`;
+  },
+  shareCalculationOnWhatsApp() {
+    const rent = Number(document.getElementById('calc-rent')?.value) || 0;
+    const roommates = Number(document.getElementById('calc-roommates')?.value) || 1;
+    const electricity = Number(document.getElementById('calc-electricity')?.value) || 0;
+    const mess = Number(document.getElementById('calc-mess')?.value) || 0;
+    const wifi = Number(document.getElementById('calc-wifi')?.value) || 0;
+    const totalSharedRoom = rent + electricity + wifi;
+    const perPersonRoom = totalSharedRoom / roommates;
+    const perPersonTotal = Math.round(perPersonRoom + mess);
+
+    const text = encodeURIComponent(`🏠 *Addix Stay - Room Expense Split*\n\n` +
+      `• Base Rent: ₹${rent}\n` +
+      `• Roommates: ${roommates}\n` +
+      `• Electricity: ₹${electricity}\n` +
+      `• Mess Food: ₹${mess} per person\n` +
+      `• Wi-Fi & Extra: ₹${wifi}\n\n` +
+      `👉 *Per Person Total: ₹${perPersonTotal}/month*\n\n` +
+      `Calculated via Addix Stay (https://hazaribagh-stay.vercel.app)`);
+
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  },
+
+  // Smart WhatsApp Query Modal
+  openWhatsAppQueryModal(propertyId) {
+    const prop = this.properties.find(p => p.id === propertyId);
+    if (!prop) return;
+    this.activeQueryProperty = prop;
+    const modal = document.getElementById('whatsapp-query-modal');
+    const titleEl = document.getElementById('wq-property-title');
+    if (titleEl) titleEl.textContent = `${prop.title} (${prop.locality}, ${prop.district || 'Hazaribagh'})`;
+    if (modal) modal.classList.remove('hidden');
+  },
+  closeWhatsAppQueryModal() {
+    const modal = document.getElementById('whatsapp-query-modal');
+    if (modal) modal.classList.add('hidden');
+    this.activeQueryProperty = null;
+  },
+  sendPresetWhatsApp(choice) {
+    if (!this.activeQueryProperty) return;
+    const p = this.activeQueryProperty;
+    const dist = p.district || 'Hazaribagh';
+    let query = '';
+    if (choice === 1) query = `Namaste ${p.ownerName} ji! Main Addix Stay par aapki property "${p.title}" (${p.locality}, ${dist}) dekh raha hoon. Isme room/bed abhi vacant hai kya? Kab se shift ho sakte hain?`;
+    else if (choice === 2) query = `Namaste! Aapke hostel/room "${p.title}" me mess food included hai kya? Khane ki quality aur timings kya hain?`;
+    else if (choice === 3) query = `Namaste! Main "${p.title}" ko dekhne aana chahta hoon. Exact landmark bataiye aur kab visit kar sakte hain?`;
+    else if (choice === 4) query = `Namaste! "${p.title}" ka rent ₹${p.price}/${p.pricePeriod} hai, kya student ke liye thoda discount ya negotiation possible hai?`;
+
+    const url = `https://wa.me/${p.ownerWhatsapp}?text=${encodeURIComponent(query)}`;
+    window.open(url, '_blank');
+    this.closeWhatsAppQueryModal();
+  },
+  sendCustomWhatsApp() {
+    if (!this.activeQueryProperty) return;
+    const p = this.activeQueryProperty;
+    const customInp = document.getElementById('wq-custom-text');
+    const msg = customInp ? customInp.value.trim() : '';
+    if (!msg) return;
+    const fullMsg = `Namaste ${p.ownerName} ji! I am inquiring about "${p.title}" in ${p.locality}: ${msg}`;
+    window.open(`https://wa.me/${p.ownerWhatsapp}?text=${encodeURIComponent(fullMsg)}`, '_blank');
+    this.closeWhatsAppQueryModal();
+  },
+
+  // Student Safety Helpline Modal
+  openHelplineModal() {
+    const modal = document.getElementById('helpline-modal');
+    if (modal) modal.classList.remove('hidden');
+  },
+  closeHelplineModal() {
+    const modal = document.getElementById('helpline-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
   filterAndRenderProperties() {
     let filtered = [...this.properties];
+
+    if (this.showingShortlistOnly) {
+      filtered = filtered.filter(p => this.shortlist.includes(p.id));
+    } else {
+      if (this.activeDistrictFilter && this.activeDistrictFilter !== 'all') {
+        filtered = filtered.filter(p => (p.district || 'Hazaribagh').toLowerCase() === this.activeDistrictFilter.toLowerCase());
+      }
+    }
 
     if (this.activeCategoryFilter && this.activeCategoryFilter !== 'all') {
       filtered = filtered.filter(p => p.category === this.activeCategoryFilter);
@@ -446,10 +665,23 @@ const App = {
       filtered = filtered.filter(p => p.locality.toLowerCase() === this.activeLocalityFilter.toLowerCase());
     }
 
+    if (this.activeBudgetFilter && this.activeBudgetFilter !== 'all') {
+      if (this.activeBudgetFilter === 'under2500') {
+        filtered = filtered.filter(p => Number(p.price) <= 2500);
+      } else if (this.activeBudgetFilter === '2500to5000') {
+        filtered = filtered.filter(p => Number(p.price) > 2500 && Number(p.price) <= 5000);
+      } else if (this.activeBudgetFilter === '5000to10000') {
+        filtered = filtered.filter(p => Number(p.price) > 5000 && Number(p.price) <= 10000);
+      } else if (this.activeBudgetFilter === 'above10000') {
+        filtered = filtered.filter(p => Number(p.price) > 10000);
+      }
+    }
+
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
       filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(q) ||
+        (p.district && p.district.toLowerCase().includes(q)) ||
         p.locality.toLowerCase().includes(q) ||
         p.address.toLowerCase().includes(q) ||
         p.landmark.toLowerCase().includes(q) ||
@@ -468,7 +700,8 @@ const App = {
   renderPropertiesList(properties) {
     const container = document.getElementById('properties-grid');
     const countBadge = document.getElementById('results-count-badge');
-    if (countBadge) countBadge.textContent = `${properties.length} Properties in Hazaribagh`;
+    const districtTitle = this.showingShortlistOnly ? 'Saved Shortlist' : (this.activeDistrictFilter === 'all' ? 'Jharkhand' : this.activeDistrictFilter);
+    if (countBadge) countBadge.textContent = `${properties.length} Properties in ${districtTitle}`;
 
     if (!container) return;
 
@@ -478,8 +711,8 @@ const App = {
           <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             <i class="fa-solid fa-house-chimney-crack"></i>
           </div>
-          <h3 class="text-xl font-bold text-slate-800 mb-2">Hazaribagh me koi matching property nahi mili</h3>
-          <p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Aap filters ko reset karein ya Chatbot "Hazaribagh Mitra" se poochhein.</p>
+          <h3 class="text-xl font-bold text-slate-800 mb-2">${districtTitle} me koi matching property nahi mili</h3>
+          <p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Aap filters ko reset karein ya Chatbot "Mitra AI" se poochhein.</p>
           <button onclick="App.resetFilters()" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 shadow-md">
             Reset All Filters
           </button>
@@ -490,22 +723,31 @@ const App = {
 
     container.innerHTML = properties.map(p => {
       const catMeta = HAZARIBAGH_DATA.categories[p.category] || HAZARIBAGH_DATA.categories.student_hostel;
-      const whatsappText = encodeURIComponent(`Namaste! I am interested in your property "${p.title}" located at ${p.locality}, Hazaribagh (Rent: ₹${p.price}/${p.pricePeriod}). Is it currently available for booking?`);
+      const isSaved = this.shortlist.includes(p.id);
+      const districtName = p.district || 'Hazaribagh';
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
 
       return `
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group relative">
           <!-- Card Image Container -->
           <div class="relative h-52 overflow-hidden bg-slate-100">
             <img src="${p.images[0]}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             
-            <!-- Category Tag -->
-            <div class="absolute top-3 left-3 flex items-center gap-2">
+            <!-- Category Tag & Featured Badge -->
+            <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
               <span class="${catMeta.bgClass} text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
                 <i class="fa-solid ${catMeta.icon}"></i> ${catMeta.short}
               </span>
               ${p.isFeatured ? '<span class="bg-amber-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow"><i class="fa-solid fa-star"></i> FEATURED</span>' : ''}
+              <span class="bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                📍 ${districtName}
+              </span>
             </div>
+
+            <!-- Shortlist Bookmark Heart Button -->
+            <button onclick="App.toggleShortlist('${p.id}', event)" data-shortlist-id="${p.id}" class="btn-shortlist ${isSaved ? 'active' : ''} absolute top-3 right-3 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md text-slate-600 flex items-center justify-center shadow-lg transition" title="Save to Shortlist">
+              <i class="${isSaved ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart"></i>
+            </button>
 
             <!-- Price Tag -->
             <div class="absolute bottom-3 right-3 bg-slate-900/90 backdrop-blur-md text-white px-3.5 py-1.5 rounded-xl font-extrabold text-base shadow-lg">
@@ -523,7 +765,7 @@ const App = {
             <div>
               <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
                 <span class="flex items-center gap-1 font-semibold text-blue-600">
-                  <i class="fa-solid fa-location-dot"></i> ${p.locality}, Hazaribagh
+                  <i class="fa-solid fa-location-dot"></i> ${p.locality}, ${districtName}
                 </span>
                 <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium pulse-available">
                   ${p.availableRooms ? `${p.availableRooms} Vacant` : 'Available'}
@@ -552,17 +794,18 @@ const App = {
             <!-- Direct Contact & Action Bar -->
             <div class="pt-3 border-t border-slate-100 space-y-2">
               <div class="flex items-center justify-between text-xs text-slate-600 mb-2">
-                <span class="flex items-center gap-1 font-semibold">
-                  <i class="fa-solid fa-circle-user text-slate-400"></i> ${p.ownerName}
+                <span class="flex items-center gap-1 font-bold text-slate-800">
+                  <i class="fa-solid fa-circle-user text-blue-500"></i> ${p.ownerName}
+                  <i class="fa-solid fa-circle-check text-blue-500 text-[11px]" title="Verified Owner"></i>
                 </span>
-                <span class="text-slate-400 text-[11px]">GPS Verified</span>
+                <span class="text-emerald-700 font-semibold text-[11px] bg-emerald-50 px-2 py-0.5 rounded">0% Brokerage</span>
               </div>
 
               <div class="grid grid-cols-2 gap-2">
-                <!-- Direct WhatsApp Button -->
-                <a href="https://wa.me/${p.ownerWhatsapp}?text=${whatsappText}" target="_blank" class="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-3 rounded-xl text-xs font-bold transition shadow-sm">
-                  <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
-                </a>
+                <!-- Smart WhatsApp Button -->
+                <button onclick="App.openWhatsAppQueryModal('${p.id}')" class="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-3 rounded-xl text-xs font-bold transition shadow-sm">
+                  <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Chat
+                </button>
 
                 <!-- Direct Call Button -->
                 <a href="tel:${p.ownerPhone}" class="flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-900 text-white py-2 px-3 rounded-xl text-xs font-bold transition shadow-sm">
@@ -572,10 +815,10 @@ const App = {
 
               <div class="grid grid-cols-3 gap-1.5 pt-1">
                 <button onclick="App.openPropertyDetailModal('${p.id}')" class="col-span-2 text-center text-xs font-semibold py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
-                  <i class="fa-solid fa-eye"></i> View Details
+                  <i class="fa-solid fa-eye"></i> View Full Details
                 </button>
                 <a href="${googleMapsUrl}" target="_blank" class="text-center text-xs font-semibold py-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition" title="Get GPS Directions on Google Maps">
-                  <i class="fa-solid fa-location-arrow text-blue-500"></i> Map
+                  <i class="fa-solid fa-location-arrow text-blue-500"></i> Map Dir
                 </a>
               </div>
             </div>
@@ -588,11 +831,22 @@ const App = {
   resetFilters() {
     this.activeCategoryFilter = 'all';
     this.activeLocalityFilter = 'all';
+    this.activeBudgetFilter = 'all';
+    this.showingShortlistOnly = false;
     this.searchQuery = '';
     const sInput = document.getElementById('search-input');
     if (sInput) sInput.value = '';
     const locSelect = document.getElementById('locality-filter-select');
     if (locSelect) locSelect.value = 'all';
+
+    const navShortlist = document.getElementById('nav-shortlist-btn');
+    if (navShortlist) navShortlist.classList.remove('bg-red-50', 'text-red-600', 'font-bold');
+
+    document.querySelectorAll('.budget-filter-btn').forEach((b, idx) => {
+      b.classList.toggle('active', idx === 0);
+      b.classList.toggle('bg-white/20', idx === 0);
+      b.classList.toggle('font-bold', idx === 0);
+    });
 
     document.querySelectorAll('.category-filter-btn').forEach((b, idx) => {
       if (idx === 0) {
@@ -617,22 +871,23 @@ const App = {
     if (!modal || !content) return;
 
     const catMeta = HAZARIBAGH_DATA.categories[prop.category] || HAZARIBAGH_DATA.categories.student_hostel;
-    const whatsappText = encodeURIComponent(`Namaste! I am inquiring about "${prop.title}" in ${prop.locality}, Hazaribagh.`);
+    const districtName = prop.district || 'Hazaribagh';
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${prop.lat},${prop.lng}`;
+    const isSaved = this.shortlist.includes(prop.id);
 
     content.innerHTML = `
       <div class="space-y-6">
         <!-- Image Gallery Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 rounded-2xl overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 rounded-2xl overflow-hidden relative">
           <img src="${prop.images[0]}" class="w-full h-64 md:h-80 object-cover rounded-xl" alt="${prop.title}">
           <div class="grid grid-rows-2 gap-3 h-64 md:h-80">
             <img src="${prop.images[1] || prop.images[0]}" class="w-full h-full object-cover rounded-xl" alt="${prop.title}">
             <div class="bg-slate-900 rounded-xl relative overflow-hidden flex items-center justify-center p-4">
               <div class="text-center text-white">
-                <span class="text-xs uppercase tracking-wider text-slate-400">GPS Coordinates</span>
+                <span class="text-xs uppercase tracking-wider text-slate-400">Verified GPS Location</span>
                 <p class="font-mono text-sm font-bold text-amber-400 mt-1">${prop.lat.toFixed(4)}° N, ${prop.lng.toFixed(4)}° E</p>
                 <a href="${googleMapsUrl}" target="_blank" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold">
-                  <i class="fa-solid fa-diamond-turn-right"></i> Open in Google Maps
+                  <i class="fa-solid fa-diamond-turn-right"></i> Open Navigation Directions
                 </a>
               </div>
             </div>
@@ -649,10 +904,13 @@ const App = {
               <span class="bg-slate-100 text-slate-800 text-xs font-semibold px-2.5 py-1 rounded-full">
                 <i class="fa-solid fa-users"></i> ${prop.targetAudience}
               </span>
+              <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                📍 ${districtName} District
+              </span>
             </div>
             <h2 class="text-2xl font-extrabold text-slate-900">${prop.title}</h2>
             <p class="text-sm text-slate-600 mt-1 flex items-center gap-1.5">
-              <i class="fa-solid fa-location-dot text-red-500"></i> ${prop.address}, <b>${prop.locality}</b>, Hazaribagh
+              <i class="fa-solid fa-location-dot text-red-500"></i> ${prop.address}, <b>${prop.locality}</b>, ${districtName}
             </p>
             <p class="text-xs text-amber-600 font-medium mt-0.5">
               <i class="fa-solid fa-flag"></i> Landmark: ${prop.landmark}
@@ -662,7 +920,32 @@ const App = {
           <div class="text-right flex-shrink-0 bg-blue-50 p-4 rounded-2xl border border-blue-100">
             <span class="text-xs text-slate-500 font-medium">Rent Amount</span>
             <div class="text-2xl font-black text-blue-700">₹${prop.price.toLocaleString('en-IN')}<span class="text-sm font-normal text-slate-500">/${prop.pricePeriod}</span></div>
-            ${prop.deposit ? `<span class="text-xs text-slate-500">Security Deposit: ₹${prop.deposit.toLocaleString('en-IN')}</span>` : '<span class="text-xs text-emerald-600 font-semibold">Zero Deposit</span>'}
+            ${prop.deposit ? `<span class="text-xs text-slate-500">Security Deposit: ₹${prop.deposit.toLocaleString('en-IN')}</span>` : '<span class="text-xs text-emerald-600 font-semibold">Zero Deposit Required</span>'}
+          </div>
+        </div>
+
+        <!-- Nearby Campus & Transit Distances (New Feature) -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-route text-blue-600"></i> Estimated Nearby Distances & Connectivity
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+              <span class="text-slate-500 text-[10px] block">University / Colleges</span>
+              <span class="font-bold text-slate-800">~5-8 Mins (Auto/Walk)</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+              <span class="text-slate-500 text-[10px] block">Main Coaching Hub</span>
+              <span class="font-bold text-slate-800">~3-5 Mins Walk</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+              <span class="text-slate-500 text-[10px] block">Railway / Bus Stand</span>
+              <span class="font-bold text-slate-800">~10-12 Mins Ride</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+              <span class="text-slate-500 text-[10px] block">Daily Market / Medical</span>
+              <span class="font-bold text-slate-800">~2 Mins Walk</span>
+            </div>
           </div>
         </div>
 
@@ -670,7 +953,7 @@ const App = {
         <div>
           <h4 class="font-bold text-slate-900 text-sm mb-2">Property Description & Details</h4>
           <p class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-            ${prop.description || 'Verified property in Hazaribagh with complete electricity, water and road connectivity.'}
+            ${prop.description || 'Verified property in Jharkhand with complete 24x7 water, electricity and direct owner contact.'}
           </p>
         </div>
 
@@ -686,7 +969,7 @@ const App = {
           </div>
         </div>
 
-        <!-- Owner Contact & Direct Actions -->
+        <!-- Direct Owner Actions -->
         <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 rounded-2xl shadow-xl">
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -694,21 +977,23 @@ const App = {
                 <i class="fa-solid fa-user-shield"></i>
               </div>
               <div>
-                <p class="text-xs text-slate-400 font-medium">Property Owner Contact</p>
-                <h4 class="text-lg font-bold">${prop.ownerName}</h4>
+                <p class="text-xs text-slate-400 font-medium">Direct Property Owner Contact</p>
+                <h4 class="text-lg font-bold flex items-center gap-1.5">
+                  ${prop.ownerName} <i class="fa-solid fa-circle-check text-blue-400 text-xs"></i>
+                </h4>
                 <p class="text-xs text-slate-300 mt-0.5"><i class="fa-solid fa-phone"></i> ${prop.ownerPhone} • <i class="fa-solid fa-envelope"></i> ${prop.ownerEmail}</p>
               </div>
             </div>
 
             <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
-              <a href="https://wa.me/${prop.ownerWhatsapp}?text=${whatsappText}" target="_blank" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow">
+              <button onclick="App.openWhatsAppQueryModal('${prop.id}')" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow">
                 <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp Direct
-              </a>
+              </button>
               <a href="tel:${prop.ownerPhone}" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-5 py-2.5 rounded-xl font-bold text-sm shadow">
                 <i class="fa-solid fa-phone text-xs"></i> Call Owner
               </a>
               <button onclick="App.openInquiryModal('${prop.id}', '${encodeURIComponent(prop.title)}')" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow">
-                <i class="fa-solid fa-envelope"></i> Send Inquiry
+                <i class="fa-solid fa-envelope"></i> Send Message
               </button>
             </div>
           </div>

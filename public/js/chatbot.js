@@ -1,4 +1,4 @@
-// Hazaribagh Mitra - AI Rental & Accommodation Assistant
+// Addix Stay Mitra - AI Rental & Accommodation Assistant
 
 const Chatbot = {
   isOpen: false,
@@ -8,7 +8,7 @@ const Chatbot = {
     this.messages = [
       {
         sender: 'bot',
-        text: `🙏 <b>Namaste! Main Addix Stay Assistant hoon.</b><br>Main aapko Hazaribagh me best <b>Student Hostel, Lodge, Family Flat, Hotel</b> ya <b>Shop for Rent</b> dhundhne me turant madad kar sakta hoon.<br><br>Aap mujhse Hinglish, Hindi ya English me kuch bhi pooch sakte hain!`
+        text: `🙏 <b>Namaste! Main Addix Stay AI Assistant hoon.</b><br>Main aapko Hazaribagh, Ranchi, Bokaro, Dhanbad aur poore Jharkhand me verified <b>Student Hostel, Lodge, Family Flat, Hotel</b> ya <b>Shop for Rent</b> dhundhne me turant madad kar sakta hoon.<br><br>Aap mujhse Hinglish, Hindi ya English me kuch bhi pooch sakte hain!`
       }
     ];
     this.renderMessages();
@@ -99,7 +99,7 @@ const Chatbot = {
               <img src="${p.images[0]}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0" alt="${p.title}">
               <div class="flex-1 min-w-0">
                 <p class="font-bold text-slate-900 text-xs truncate">${p.title}</p>
-                <p class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot text-red-500"></i> ${p.locality} • ₹${p.price}/${p.pricePeriod}</p>
+                <p class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot text-red-500"></i> ${p.locality}, ${p.district || 'Hazaribagh'} • ₹${p.price}/${p.pricePeriod}</p>
                 <div class="flex gap-2 mt-1">
                   <a href="https://wa.me/${p.ownerWhatsapp}" target="_blank" class="text-[10px] bg-green-500 hover:bg-green-600 text-white px-2 py-0.5 rounded font-semibold flex items-center gap-1">
                     <i class="fa-brands fa-whatsapp"></i> Chat
